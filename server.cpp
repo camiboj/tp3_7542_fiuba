@@ -33,24 +33,26 @@
 
 
 /********************************* EJECUCION *********************************/
+
 /******************************************************************************
  * RECIBE:
- * 
  *  Comando:     - 1 byte sin signo
- *
- *  Subject:     - Longitud: 4 bytes big endian sin signo.
- *               - String sin ‘\0’
- *
- *  Módulo:      - 2 bytes en big endian sin signo
- * 
- *  Exponente:   - 1 byte
- *
- *  Fechas:      - Longitud: 4 bytes big endian sin signo.
- *               - String sin ‘\0’
- */
+*/
 
 /******************************************************************************
  *comando 0
+ *
+ * RECIBE:
+ *  - Subject:     - Longitud: 4 bytes big endian sin signo.
+ *                 - String sin ‘\0’
+ *
+ *  - Módulo:      - 2 bytes en big endian sin signo
+ * 
+ *  - Exponente:   - 1 byte
+ *
+ *  - Fechas:      - Longitud: 4 bytes big endian sin signo.
+ *                 - String sin ‘\0’
+ * 
  * 
  * ANSWER (1 byte, sin signo)
  *  0 -> ​si el subject ya tiene un certificado vigente
@@ -66,10 +68,14 @@
  *      0 -> todo ok chau.
  *      1 -> elimina de su almacenamiento interno los datos del certificado
  * 
- */
+*/
 
 /******************************************************************************
  *comando 1
+ *
+ * RECIBE:
+ *  - Certificado
+ *  - Hash
  * 
  * 1- Validar que quien envió esta solicitud de baja sea quien dice ser.
  *      - Lee el subject 
@@ -84,4 +90,4 @@
  *          ==- continuo
  * 2- Elimina al solicitante de su mapa 
  * 3- Responde al cliente con un código 0
- */
+*/

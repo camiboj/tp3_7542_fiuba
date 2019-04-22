@@ -59,17 +59,17 @@
  *
  * ENVIAR:
  * 
- *  Comando:     - 1 byte sin signo (0)
+ *  - Comando:     - 1 byte sin signo (0)
  *
- *  Subject:     - Longitud: 4 bytes big endian sin signo.
- *               - String sin ‘\0’
+ *  - Subject:     - Longitud: 4 bytes big endian sin signo.
+ *                 - String sin ‘\0’
  *
- *  Módulo:      - 2 bytes en big endian sin signo
+ *  - Módulo:      - 2 bytes en big endian sin signo
  * 
- *  Exponente:   - 1 byte
+ *  - Exponente:   - 1 byte
  *
- *  Fechas:      - Longitud: 4 bytes big endian sin signo.
- *               - String sin ‘\0’
+ *  - Fechas:      - Longitud: 4 bytes big endian sin signo.
+ *                 - String sin ‘\0’
  *
  *
  * ANSWER: ​
@@ -97,12 +97,12 @@
  * 
  * ENVIAR:
  * 
- *  Comando:     - 1 byte sin signo (1)
+ *  - Comando:     - 1 byte sin signo (1)
  * 
- *  Certificado: - Aún no se pero sin los rotulos "subject:" y esos.
+ *  - Certificado: - Aún no se pero sin los rotulos "subject:" y esos.
  * 
- *  Hash:        - Encriptado primero con la clave privada del cliente
- *               - Encriptado con la pública del servidor.
+ *  - Hash:        - Encriptado primero con la clave privada del cliente y luego
+ *                   encriptado con la pública del servidor.
  * 
  * 
  * ANSWER:​ (1 byte sin signo)
