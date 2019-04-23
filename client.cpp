@@ -1,6 +1,8 @@
 
 #include <iostream>
 #include <string>
+#include "common_socket.h"
+#include "common_applicant.h"
 #define ARGUMENT_ERROR_MSSG "Error: argumentos invalidos.\n"
 #define ARGUMENT_ERROR 0
 #define USER_ERROR_MSSG "Error: usuario no registrado.\n"
@@ -123,16 +125,60 @@ int main(int argc, char* argv[]) {
         return ARGUMENT_ERROR;
     }
 
-    std::string modo1("new");
-    std::string modo2("revoke");
+    std::string mode1("new");
+    std::string mode2("revoke");
     std::string mode = std::string(argv[3]);
-    if (mode != modo1 && mode != modo2) {
+    if (mode != mode1 && mode != mode2) {
         std::cout << ARGUMENT_ERROR_MSSG;
         return ARGUMENT_ERROR;
     }
 
-    /*char* host = argv[1];
+    char* host = argv[1];
     char* port = argv[2];
+/******************************************************************************
+ *new
+ * 
+ *   ./client <ip/hostname> <puerto/servicio> new <claves clientes> 
+ *           <pública servidor> <información certificado>
+*/
+    Socket skt(host, port);
+    skt.connect_with_server();
+    std::string client_key_filename(argv[4])
+    std::string certificate_information_filename(argv[6])
+    if (mode == mode1) {
+        Key key(client_key_filename);
+        
+        /*
+        std::ifstream file;
+        file.open(certificate_information_filename); 
+        std::string line;
+        std::string subject;
+        std::string date_from;
+        std::string date_to;
+        int i = 0;
+        while (std::getline(file, line, '\n')) {
+            if (i == 0) {
+                subject = line.c_str();
+            } 
+            else if (i == 1) {
+                date_from = line.c_str();
+            }
+            else if (i == 2) {
+                date_to = line.c_str();
+            }
+        }
+        if (i == 2) {
+            date_to = date_from
+        }
+        */
+
+        Applicant ap(certificate_information_filename, key);
+
+        //skt.disables_send_operations();
+        //skt.resive()
+    }
+    
+    /*
     char* client_key_filename = argv[4];
     char* server_key_filename = argv[5];
     char* certificate = argv[6];*/

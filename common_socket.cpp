@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include <errno.h>
 #include <stdbool.h>
@@ -20,7 +21,9 @@ int Socket::receive_some(char* buf, size_t size) {
     return recv(this->current_peerskt, buf , size, MSG_NOSIGNAL);
 }
 
-int Socket::send_all(size_t size, char* buf) {
+int Socket::send_all(std::string buf, size_t size) {  
+    // es igual al de abajo pero sino puedo copiar el string en char* y llamar
+    // al de abajo.... pero copio al pedo
     int bytes_sent = 0;
     int s = 0;
     bool is_the_socket_valid = true;
@@ -37,8 +40,26 @@ int Socket::send_all(size_t size, char* buf) {
     return bytes_sent;
 }
 
+int Socket::send_all(void* buf, size_t size) {
+    int bytes_sent = 0;
+    int s = 0;
+    bool is_the_socket_valid = true;
+    char* aux = (char*) buf;
 
-Socket::Socket(char* _host, char* _port) {
+    while (bytes_sent < size && is_the_socket_valid) {
+        s = send(this->current_peerskt, &aux[bytes_sent], \
+                size-bytes_sent, MSG_NOSIGNAL);
+        if (s <= 0) {
+            return -1;
+        } else {
+            bytes_sent += s;
+        }
+    }
+    return bytes_sent;
+}
+
+
+Socket::Socket(const char* _host, const char* _port) {
     this->host = _host;
     this->port = _port;
     this->skt = 0; 
@@ -73,7 +94,7 @@ bool Socket::start() {
 
 //+++++ UNICO ++++++++
 
-bool Socket::connect_with_clients() {
+bool Socket::connect_with_client() {
     struct addrinfo *ptr = this->result;
     int s = 0;
 

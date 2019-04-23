@@ -1,4 +1,6 @@
+#include <string>
 #define ERROR_CODE 1
+
 
 /********************************** COMANDOS *********************************/
 
@@ -91,3 +93,21 @@
  * 2- Elimina al solicitante de su mapa 
  * 3- Responde al cliente con un código 0
 */
+
+int main(int argc, char* argv[]) {
+    if (argc != 4) {
+        return ERROR_CODE;
+    }
+
+    std::string claves = std::string(argv[2]);
+    std::string indice = std::string(argv[3]);
+    
+    /*
+    char* port = argv[1];
+    char* client_key_filename = argv[4];
+    char* server_key_filename = argv[5];
+    char* certificate = argv[6];
+    */
+    
+    return 0;
+}
