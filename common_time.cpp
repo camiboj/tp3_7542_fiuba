@@ -13,7 +13,7 @@ void Time::plusMonth() {
     this->date = this->date + month;
 }
 
-void Time::toString(std::string str) {
+void Time::toString(std::string& str) {
     std::time_t t = std::chrono::system_clock::to_time_t(this->date);
     str = ctime(&t); //ctime return value: string "Www Mmm dd hh:mm:ss yyyy"
     str = str.substr(BEGIN, END); //substr -> MMM DD HH:mm:SS YYYY

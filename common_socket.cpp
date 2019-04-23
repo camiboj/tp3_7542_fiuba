@@ -28,7 +28,7 @@ int Socket::send_all(std::string buf, size_t size) {
     int s = 0;
     bool is_the_socket_valid = true;
 
-    while (bytes_sent < size && is_the_socket_valid) {
+    while (bytes_sent < (int)size && is_the_socket_valid) {
         s = send(this->current_peerskt, &buf[bytes_sent], \
                 size-bytes_sent, MSG_NOSIGNAL);
         if (s <= 0) {
@@ -46,7 +46,7 @@ int Socket::send_all(void* buf, size_t size) {
     bool is_the_socket_valid = true;
     char* aux = (char*) buf;
 
-    while (bytes_sent < size && is_the_socket_valid) {
+    while (bytes_sent < (int)size && is_the_socket_valid) {
         s = send(this->current_peerskt, &aux[bytes_sent], \
                 size-bytes_sent, MSG_NOSIGNAL);
         if (s <= 0) {

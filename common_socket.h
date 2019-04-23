@@ -31,7 +31,7 @@ class Socket {
         int receive_some(char* buf, size_t size);
 
         int send_all(void* buf, size_t size);
-        int Socket::send_all(std::string buf, size_t size)
+        int send_all(std::string buf, size_t size);
         
         /*
         * Desactiva las operaciones de envío y recepción para el cliente y para si mismo

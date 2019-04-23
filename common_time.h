@@ -12,7 +12,7 @@ class Time {
          * Contenedor de tiempo que se inicializa con el dato de su creación.
         */
         Time();
-        Time(std::string filename, std::string to, std::string from);
+        //Time(std::string filename, std::string& to, std::string& from);
         /*
          * Le suma 30 dias a la fecha actual.
         */
@@ -20,7 +20,7 @@ class Time {
         /*
          * Almacena en str la fecha en formato MMM DD HH:mm:SS YYYY
         */
-        void toString(std::string str);
+        void toString(std::string& str);
 };
 
 #endif

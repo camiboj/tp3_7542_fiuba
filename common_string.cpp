@@ -12,3 +12,5 @@ void String::send(Socket skt) {
     //no mandar el /0 !!!
     //igual, si itero hasta length no deberia mandarlo
 }
+
+String::~String() {}

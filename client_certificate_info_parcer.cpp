@@ -4,9 +4,9 @@
 #include "client_certificate_info_parcer.h"
 #include "common_time.h"
 
-CertificateInfoParcer::CertificateInfoParcer(std::string filename, \
-                                std::string subject, std::string from,\
-                                std::string to) {
+CertificateInfoParcer::CertificateInfoParcer(std::string& filename, \
+                                std::string& subject, std::string& from,\
+                                std::string& to) {
     std::ifstream file;
     file.open(filename); 
     std::string line;
@@ -30,3 +30,5 @@ CertificateInfoParcer::CertificateInfoParcer(std::string filename, \
         tm.toString(to);
     }
 }
+
+CertificateInfoParcer::~CertificateInfoParcer() {}
