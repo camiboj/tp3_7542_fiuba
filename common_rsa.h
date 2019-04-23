@@ -1,5 +1,5 @@
-#ifndef RSA_H_
-#define RSA_H_
+#ifndef RSA_H
+#define RSA_H
 #include <stdint.h>
 
 /*

@@ -135,53 +135,16 @@ int main(int argc, char* argv[]) {
 
     char* host = argv[1];
     char* port = argv[2];
-/******************************************************************************
- *new
- * 
- *   ./client <ip/hostname> <puerto/servicio> new <claves clientes> 
- *           <pública servidor> <información certificado>
-*/
     Socket skt(host, port);
     skt.connect_with_server();
-    std::string client_key_filename(argv[4])
-    std::string certificate_information_filename(argv[6])
+
     if (mode == mode1) {
-        Key key(client_key_filename);
-        
-        /*
-        std::ifstream file;
-        file.open(certificate_information_filename); 
-        std::string line;
-        std::string subject;
-        std::string date_from;
-        std::string date_to;
-        int i = 0;
-        while (std::getline(file, line, '\n')) {
-            if (i == 0) {
-                subject = line.c_str();
-            } 
-            else if (i == 1) {
-                date_from = line.c_str();
-            }
-            else if (i == 2) {
-                date_to = line.c_str();
-            }
-        }
-        if (i == 2) {
-            date_to = date_from
-        }
-        */
-
-        Applicant ap(certificate_information_filename, key);
-
-        //skt.disables_send_operations();
-        //skt.resive()
+        std::string client_key_filename(argv[4]);
+        std::string certificate_information_filename(argv[6]);
+        //Key key(client_key_filename);
+        ApplicantRequest rquest(certificate_information_filename, client_key_filename);
+        request.send(skt);
     }
-    
-    /*
-    char* client_key_filename = argv[4];
-    char* server_key_filename = argv[5];
-    char* certificate = argv[6];*/
     
     return 0;
 }

@@ -14,7 +14,9 @@
 Key::Key(uint8_t _exponent, uint16_t _module):
     exponent(_exponent), module(_module) {}
 
-Key::Key(std::string filename) {
+Key::Key() {}
+
+void Key::set(std::string filename) {
     std::ifstream file;
     file.open(filename); 
     std::string line;
@@ -30,6 +32,7 @@ Key::Key(std::string filename) {
     }
     //file.close();
 }
+
 
 Key::~Key() {}
 
