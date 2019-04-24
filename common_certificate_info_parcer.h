@@ -1,7 +1,6 @@
-#ifndef CLIENT_CERTIFICATE_INFO_PARCER_H
-#define CLIENT_CERTIFICATE_INFO_PARCER_H
+#ifndef COMMON_CERTIFICATE_INFO_PARCER_H
+#define COMMON_CERTIFICATE_INFO_PARCER_H
 #include <string>
-#include "common_socket.h"
 
 /******************************************************************************
  * Lee una rchivo de tipo 

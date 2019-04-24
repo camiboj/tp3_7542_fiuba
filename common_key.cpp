@@ -37,6 +37,6 @@ void Key::set(std::string filename) {
 Key::~Key() {}
 
 void Key::send(Socket skt) {
-    skt.send_all(&this->exponent, EXPONENT_LEN);
-    skt.send_all(&this->module, MODULE_LEN);
+    skt.sendAll(&this->exponent, EXPONENT_LEN);
+    skt.sendAll(&this->module, MODULE_LEN);
 }

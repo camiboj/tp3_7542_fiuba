@@ -10,6 +10,7 @@ class Socket {
         int skt;
         int current_peerskt;
         struct addrinfo *result;
+        void start(const char* _host, const char* _port);
 
     public:
         /*
@@ -17,32 +18,33 @@ class Socket {
         * protocolo para poder conectarse al cliente por medio del port y host indicados
         */
         Socket(const char* _host, const char* _port);
+        Socket(const char* _port);
         ~Socket();
 
         /*
         * Almacena los parametros necesarios para la incialización del socket.
         */
-        bool start();
 
-        bool connect_with_client();
+        bool connectWithClients();
 
-        int accept_client();
+        int acceptClient();
 
-        int receive_some(char* buf, size_t size);
+        bool reciveAll(void* buf, size_t len);
+        int receiveSome(void* buf, size_t size);
 
-        int send_all(void* buf, size_t size);
-        int send_all(std::string buf, size_t size);
+        int sendAll(void* buf, size_t size);
+        int sendAll(std::string buf, size_t size);
         
         /*
         * Desactiva las operaciones de envío y recepción para el cliente y para si mismo
         */
-        void disable_client();
+        void disableClient();
 
         /*
-        * desabilita el canal de escritura
+        * Desabilita el canal de escritura
         */
-        void disables_send_operations();
-        bool connect_with_server();
+        void disablesSendOperations();
+        bool connectWithServer();
 };
 
 #endif

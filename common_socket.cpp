@@ -15,32 +15,76 @@
 
 #define MAX_WAITING_CLIENTS 20
 
-//+++++++ IGUAL ++++++++++
 
-int Socket::receive_some(char* buf, size_t size) {
+/******************************************************************************
+ * TODOS LOS 
+ * if (s < 0) {
+ *    return 
+ * }
+ * TIENEN QUE SER EXCEPSIONES EN UN FUTURO.
+*/
+
+void Socket::start(const char* host, const char* port) {
+    this->skt = 0; 
+    this->current_peerskt = 0;
+    
+    int s = 0;
+    struct addrinfo hints; 
+    memset(&hints, 0, sizeof(struct addrinfo));
+    hints.ai_family = AF_INET;       
+    hints.ai_socktype = SOCK_STREAM; 
+    hints.ai_flags = 0;   
+
+    s = getaddrinfo(host, port, &hints, &this->result);
+
+    if (s != 0) { 
+        //do something
+    }
+}
+
+Socket::Socket(const char* port) {
+    this->start(NULL, port);
+}
+
+Socket::Socket(const char* host, const char* port) {
+    this->start(host, port);
+}
+
+bool Socket::reciveAll(void* buf, size_t len) {    
+    memset(buf, 0, len);
+    size_t received = 0;
+    int status = 0;
+    bool is_there_an_error = false;
+    char* aux = (char*) buf;
+    while (received < len && !is_there_an_error) {
+        status = this->receiveSome(&aux[received], len - received);
+        if (status == 0) { 
+            is_there_an_error = true;
+        } else if (status < 0) { 
+            is_there_an_error = true;
+        } else {
+            received += status;
+        }
+    }
+    return is_there_an_error;
+}
+
+
+int Socket::receiveSome(void* buf, size_t size) {
     return recv(this->current_peerskt, buf , size, MSG_NOSIGNAL);
 }
 
-int Socket::send_all(std::string buf, size_t size) {  
-    // es igual al de abajo pero sino puedo copiar el string en char* y llamar
-    // al de abajo.... pero copio al pedo
-    int bytes_sent = 0;
-    int s = 0;
-    bool is_the_socket_valid = true;
-
-    while (bytes_sent < (int)size && is_the_socket_valid) {
-        s = send(this->current_peerskt, &buf[bytes_sent], \
-                size-bytes_sent, MSG_NOSIGNAL);
-        if (s <= 0) {
-            return -1;
-        } else {
-            bytes_sent += s;
-        }
+int Socket::sendAll(std::string buf, size_t size) {  
+    // Opcion 1: strcopy
+    // Opcion 2: repetir el código de la de abajo.  
+    int sent = 0;
+    for (size_t i = 0; i < size && sent > 0; ++i){
+        sent = this->sendAll(&buf[i], size);
     }
-    return bytes_sent;
+    return sent;
 }
 
-int Socket::send_all(void* buf, size_t size) {
+int Socket::sendAll(void* buf, size_t size) {
     int bytes_sent = 0;
     int s = 0;
     bool is_the_socket_valid = true;
@@ -59,42 +103,14 @@ int Socket::send_all(void* buf, size_t size) {
 }
 
 
-Socket::Socket(const char* _host, const char* _port) {
-    this->host = _host;
-    this->port = _port;
-    this->skt = 0; 
-    this->current_peerskt = 0;
-}
-
 Socket::~Socket() {
     freeaddrinfo(this->result);
     shutdown(this->skt, SHUT_RDWR);
     close(this->skt);
 }
 
-bool Socket::start() {
-    int s = 0;
 
-    struct addrinfo hints; 
-
-    memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_family = AF_INET;       
-    hints.ai_socktype = SOCK_STREAM; 
-    hints.ai_flags = 0;   
-
-    s = getaddrinfo(this->host, this->port, &hints, &this->result);
-
-    if (s != 0) { 
-        return false;
-    }
-    return true;
-}
-
-
-
-//+++++ UNICO ++++++++
-
-bool Socket::connect_with_client() {
+bool Socket::connectWithClients() {
     struct addrinfo *ptr = this->result;
     int s = 0;
 
@@ -122,22 +138,20 @@ bool Socket::connect_with_client() {
     return true;
 }
 
-void Socket::disable_client() {
+void Socket::disableClient() {
         shutdown(this->current_peerskt, SHUT_RDWR); 
         close(this->current_peerskt);
 }
 
 //-1 si falla
-int Socket::accept_client(){
+int Socket::acceptClient(){
     int peerskt = accept(this->skt, NULL, NULL);
     this->current_peerskt = peerskt;
     return peerskt;
 }
 
 
-//+++++ UNICO ++++++++
-
-bool Socket::connect_with_server() {
+bool Socket::connectWithServer() {
     int s = 0;
     bool are_we_connected = false;
     struct addrinfo *ptr;
@@ -154,6 +168,6 @@ bool Socket::connect_with_server() {
     return are_we_connected;
 }
 
-void Socket::disables_send_operations() {
+void Socket::disablesSendOperations() {
     shutdown(this->skt, SHUT_WR);
 }

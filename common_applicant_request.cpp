@@ -2,9 +2,9 @@
 #include <sstream>
 #include <iostream>
 #include <string>
+#include "common_certificate_info_parcer.h"
 #include "common_applicant_request.h"
 #include "common_time.h"
-#include "client_certificate_info_parcer.h"
 #define COMMAND_SIZE 1
 
 
@@ -22,7 +22,7 @@ void ApplicantRequest::send(Socket skt) {
     String from(this->date_from);
     String to(this->date_to);
 
-    skt.send_all(&command, COMMAND_SIZE);
+    skt.sendAll(&command, COMMAND_SIZE);
     sub_aux.send(skt);
     key.send(skt);
     from.send(skt);

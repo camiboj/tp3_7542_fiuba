@@ -136,7 +136,7 @@ int main(int argc, char* argv[]) {
     char* host = argv[1];
     char* port = argv[2];
     Socket skt(host, port);
-    skt.connect_with_server();
+    skt.connectWithServer();
 
     if (mode == mode1) {
         std::string client_key_filename(argv[4]);

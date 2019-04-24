@@ -1,7 +1,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include "client_certificate_info_parcer.h"
+#include "common_certificate_info_parcer.h"
 #include "common_time.h"
 
 CertificateInfoParcer::CertificateInfoParcer(std::string& filename, \

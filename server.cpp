@@ -1,6 +1,7 @@
 #include <string>
+#include "common_socket.h"
 #define ERROR_CODE 1
-
+#define COMMAND_SIZE 1
 
 /********************************** COMANDOS *********************************/
 
@@ -101,7 +102,19 @@ int main(int argc, char* argv[]) {
 
     std::string claves = std::string(argv[2]);
     std::string indice = std::string(argv[3]);
+     if (argc !=4) {
+	    fprintf(stderr, "Uso:\n./server <puerto> <input> [<template>]\n");
+	    return 1;
+    }
+
     
+    Socket skt(argv[1]);
+    skt.connectWithClients();
+
+    uint8_t command;
+    skt.acceptClient();
+    skt.receiveSome(&command, COMMAND_SIZE);
+
     /*
     char* port = argv[1];
     char* client_key_filename = argv[4];
