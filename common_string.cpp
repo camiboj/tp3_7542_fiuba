@@ -1,16 +1,63 @@
-#include "common_string.h"
 #include <endian.h>
+#include <iostream>
+#include "common_string.h"
 #define LEN_SIZE 4
 
+
 String::String(std::string& _str): str(_str) {
-    len = htobe16(str.length());
+    //std::cerr << "String: " << str << '\n';
+    this->len = (uint32_t) str.length();
+    //this->len = htobe32(aux);
+}
+void String::recive(Socket skt) {
+    uint32_t aux_len;
+    skt.reciveSome(&aux_len, LEN_SIZE);
+    this->len = htobe32(aux_len);
+    fprintf(stderr, "Len: %d \n", this->len);
+
+    std::string subject;
+    skt.reciveSome(subject, this->len);
+    std::cerr << "STRING: " << this->str << '\n';
 }
 
 void String::send(Socket skt) {
-    skt.sendAll(&len, LEN_SIZE);
+    uint32_t aux = htobe32(this->len);
+    skt.sendAll(&aux, LEN_SIZE);
     skt.sendAll(this->str, str.length());
+    std::cerr << "Strng sent: " << this->str << '\n';
     //no mandar el /0 !!!
     //igual, si itero hasta length no deberia mandarlo
 }
 
 String::~String() {}
+
+
+/************************************ PRINT ***********************************
+*    fprintf(stderr, "Len: %d \n", aux);
+*    fprintf(stderr, "Len:");
+*    fprintf(stderr, "Len: %d \n", this->len);
+*
+*    char* ptr = (char*) &aux;
+*    uint8_t _aux = ptr[0];
+*    fprintf(stderr, "Len: %d", _aux);
+*    _aux = ptr[1];
+*    fprintf(stderr, " %d", _aux);
+*    _aux = ptr[2];
+*    fprintf(stderr, " %d", _aux);
+*    _aux = ptr[3];
+*    fprintf(stderr, " %d", _aux);
+*
+*    std::cerr << "\nNow.. big endian: \n";
+*
+*    ptr = (char*) &this->len;
+*    _aux = ptr[0];
+*    fprintf(stderr, "Len: %d", _aux);
+*    _aux = ptr[1];
+*    fprintf(stderr, " %d", _aux);
+*    _aux = ptr[2];
+*    fprintf(stderr, " %d", _aux);
+*    _aux = ptr[3];
+*    fprintf(stderr, " %d", _aux);
+*    std::cerr << '\n';
+*    std::cerr << '\n';
+*/

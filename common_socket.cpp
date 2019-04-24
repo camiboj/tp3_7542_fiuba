@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <string>
+#include <iostream>
 
 #include <errno.h>
 #include <stdbool.h>
@@ -57,7 +58,7 @@ bool Socket::reciveAll(void* buf, size_t len) {
     bool is_there_an_error = false;
     char* aux = (char*) buf;
     while (received < len && !is_there_an_error) {
-        status = this->receiveSome(&aux[received], len - received);
+        status = this->reciveSome(&aux[received], len - received);
         if (status == 0) { 
             is_there_an_error = true;
         } else if (status < 0) { 
@@ -70,7 +71,21 @@ bool Socket::reciveAll(void* buf, size_t len) {
 }
 
 
-int Socket::receiveSome(void* buf, size_t size) {
+int Socket::reciveSome(std::string& str, size_t size) {
+    std::cerr << "size: " << size << '\n';
+    char c;
+    int recived = 0;
+    for (size_t i = 0; i < size; ++i){
+        recived = recv(this->current_peerskt, &c , 1, MSG_NOSIGNAL);
+        str.append(1, c);
+        fprintf(stderr, "%c", c);
+    }
+    fprintf(stderr, "\n");
+    //std::cerr << "STRING: " << str << '\n';
+    return recived;
+}
+
+int Socket::reciveSome(void* buf, size_t size) {
     return recv(this->current_peerskt, buf , size, MSG_NOSIGNAL);
 }
 
@@ -78,13 +93,20 @@ int Socket::sendAll(std::string buf, size_t size) {
     // Opcion 1: strcopy
     // Opcion 2: repetir el código de la de abajo.  
     int sent = 0;
-    for (size_t i = 0; i < size && sent > 0; ++i){
-        sent = this->sendAll(&buf[i], size);
+    for (size_t i = 0; i < size && sent >= 0; ++i){
+        //fprintf(stderr, "%c \n", buf[i]);
+        sent = this->sendAll(&buf[i], 1);
     }
     return sent;
 }
 
 int Socket::sendAll(void* buf, size_t size) {
+    //fprintf(stderr, "hola\n");
+    /*char* ptr = (char*) buf;
+    for (int i = 0; i<(int)size; i++) {
+        fprintf(stderr, "%c - %d\n", ptr[i], (uint8_t)ptr[i]);
+    }*/
+    
     int bytes_sent = 0;
     int s = 0;
     bool is_the_socket_valid = true;

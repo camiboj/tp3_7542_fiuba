@@ -17,6 +17,7 @@ class String {
         String(std::string& _str);
         ~String();
         void send(Socket skt);
+        void recive(Socket skt);
 };
 
 #endif

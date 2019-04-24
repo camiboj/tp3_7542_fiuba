@@ -16,9 +16,9 @@
 
 /******************************************************************************
  *new
- * 
- *   ./client <ip/hostname> <puerto/servicio> new <claves clientes> 
- *           <pública servidor> <información certificado>
+ *
+ *   ./client <ip/hostname> <puerto/servicio> new <información certificado>
+ *           <claves clientes> <pública servidor>
 */
 
 /******************************************************************************
@@ -139,8 +139,8 @@ int main(int argc, char* argv[]) {
     skt.connectWithServer();
 
     if (mode == mode1) {
-        std::string client_key_filename(argv[4]);
-        std::string certificate_information_filename(argv[6]);
+        std::string client_key_filename(argv[5]);
+        std::string certificate_information_filename(argv[4]);
         //Key key(client_key_filename);
         ApplicantRequest request(certificate_information_filename, client_key_filename);
         request.send(skt);

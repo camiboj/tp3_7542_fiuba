@@ -5,30 +5,35 @@
 #include "common_key.h"
 #define EXPONENT_LEN 1
 #define MODULE_LEN 2
-#define MODULE_MAX_VALUE 65535
-#define EPONENT_MAX_VALUE 255
-#define STR_MOD_MAX_LEN 5
-#define STR_EXP_MAX_LEN 3
+#define PUBLIC_EXP_POS 0
+#define PRIVATE_EXP_POS 1
+#define MODULE_POS 2
 
-
+/*
 Key::Key(uint8_t _exponent, uint16_t _module):
     exponent(_exponent), module(_module) {}
-
+*/
 Key::Key() {}
 
+void Key::recive(Socket skt) {
+    skt.reciveSome(&this->module, MODULE_LEN);
+    skt.reciveSome(&this->public_exponent, EXPONENT_LEN);
+}
 void Key::set(std::string filename) {
     std::ifstream file;
     file.open(filename); 
     std::string line;
-    bool is_exponent_set = false;
-    while (std::getline(file, line, ' ')){
+    int i = 0;
+    while (std::getline(file, line, ' ')) {
         if (line.length() == 0) continue;
-        if (!is_exponent_set){
-            this->exponent = (uint8_t) atoi(line.c_str());
-            is_exponent_set = true;
-        } else {
-            this->module = (uint8_t) atoi(line.c_str());
+        if (i == PUBLIC_EXP_POS) {
+            this->public_exponent = (uint8_t) atoi(line.c_str());
+        } else if (i == PRIVATE_EXP_POS) {
+            this->private_expponent = (uint8_t) atoi(line.c_str());
+        } else if (i == MODULE_POS) {
+            this->module = (uint16_t) atoi(line.c_str());
         }
+        i++;
     }
     //file.close();
 }
@@ -37,6 +42,6 @@ void Key::set(std::string filename) {
 Key::~Key() {}
 
 void Key::send(Socket skt) {
-    skt.sendAll(&this->exponent, EXPONENT_LEN);
+    skt.sendAll(&this->public_exponent, EXPONENT_LEN);
     skt.sendAll(&this->module, MODULE_LEN);
 }

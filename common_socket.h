@@ -29,8 +29,10 @@ class Socket {
 
         int acceptClient();
 
+        
         bool reciveAll(void* buf, size_t len);
-        int receiveSome(void* buf, size_t size);
+        int reciveSome(std::string& str, size_t size);
+        int reciveSome(void* buf, size_t size);
 
         int sendAll(void* buf, size_t size);
         int sendAll(std::string buf, size_t size);

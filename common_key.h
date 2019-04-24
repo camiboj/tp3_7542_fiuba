@@ -6,15 +6,16 @@
 
 class Key {
     private:
-        uint8_t exponent;   //1 byte
+        uint8_t public_exponent;   //1 byte
+        uint8_t private_expponent; //1 byte
         uint16_t module;    //2 bytes
     public:
         Key();
-        Key(uint8_t _exponent, uint16_t _module);
+        //Key(uint8_t _exponent, uint16_t _module);
         ~Key();
         /*
          * Recibe el nombre de un archivo de tipo
-         * <exp_publico> <modulo>
+         * <exp_publico> <exp_privado> <modulo>
          *
          * Los distintos campos pueden estar separados por 1 o más espacios, 
          * únicamente se garantiza que estos se encuentran en una misma línea.
@@ -26,6 +27,7 @@ class Key {
         * Exponente: en 1 byte.
         */
         void send(Socket skt);
+        void recive(Socket skt);
 };
 
 #endif

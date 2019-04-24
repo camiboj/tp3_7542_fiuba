@@ -1,7 +1,11 @@
 #include <string>
+#include <iostream>
 #include "common_socket.h"
+#include "common_string.h"
+#include "common_key.h"
 #define ERROR_CODE 1
 #define COMMAND_SIZE 1
+#define LEN_SIZE 4
 
 /********************************** COMANDOS *********************************/
 
@@ -113,7 +117,44 @@ int main(int argc, char* argv[]) {
 
     uint8_t command;
     skt.acceptClient();
-    skt.receiveSome(&command, COMMAND_SIZE);
+    skt.reciveSome(&command, COMMAND_SIZE);
+    //fprintf(stderr, "Command: %d\n", command);
+    //skt.receiveSome(&command, COMMAND_SIZE);
+    if (command == 0) {
+        //std::cerr << "ACA \n";
+        std::string subject;
+        String my_subject(subject);
+        my_subject.recive(skt);
+        std::cerr << "Subject: " << subject << '\n';
+        std::cerr << "To: \n";
+        Key clien_public_key;
+        clien_public_key.recive(skt);
+        
+        std::string date_to;
+        String my_date_to(date_to);
+        my_date_to.recive(skt);
+        std::cerr << "To: " << date_to << '\n';
+
+        std::string date_from;
+        String my_date_from(date_from);
+        my_date_from.recive(skt);
+        std::cerr << "From: " << date_from << '\n';
+
+
+        std::cerr << "ACA \n";
+        /*  
+         * Recibo:
+         * 
+         * <subject__size>  4 bytes big endian sin signo
+         * <subject>        String sin ‘\0’
+         * <module>          2 bytes big endian sin signo
+         * <exponent>       1 byte
+         * <date__size>     4 bytes big endian sin signo
+         * <date_from>      String sin ‘\0’
+         * <date__size>     4 bytes big endian sin signo
+         * <dat_to>         String sin ‘\0’
+        */
+    }
 
     /*
     char* port = argv[1];
