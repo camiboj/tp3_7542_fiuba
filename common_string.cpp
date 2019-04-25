@@ -1,5 +1,6 @@
 #include <endian.h>
 #include <iostream>
+#include <string>
 #include "common_string.h"
 #define LEN_SIZE 4
 
@@ -9,22 +10,18 @@ String::String(std::string& _str): str(_str) {
     this->len = (uint32_t) str.length();
     //this->len = htobe32(aux);
 }
-void String::recive(Socket skt) {
+void String::recive(Socket& skt) {
     uint32_t aux_len;
     skt.reciveSome(&aux_len, LEN_SIZE);
     this->len = htobe32(aux_len);
-    fprintf(stderr, "Len: %d \n", this->len);
 
-    std::string subject;
-    skt.reciveSome(subject, this->len);
-    std::cerr << "STRING: " << this->str << '\n';
+    skt.reciveSome(this->str, this->len);
 }
 
-void String::send(Socket skt) {
+void String::send(Socket& skt) {
     uint32_t aux = htobe32(this->len);
     skt.sendAll(&aux, LEN_SIZE);
     skt.sendAll(this->str, str.length());
-    std::cerr << "Strng sent: " << this->str << '\n';
     //no mandar el /0 !!!
     //igual, si itero hasta length no deberia mandarlo
 }

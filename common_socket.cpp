@@ -22,10 +22,10 @@
  * if (s < 0) {
  *    return 
  * }
- * TIENEN QUE SER EXCEPSIONES EN UN FUTURO.
+ * TIENEN QUE SER EXCEPCIONES EN UN FUTURO.
 */
 
-void Socket::start(const char* host, const char* port) {
+void Socket::start(const char* host, const char* port, int flag) {
     this->skt = 0; 
     this->current_peerskt = 0;
     
@@ -34,7 +34,7 @@ void Socket::start(const char* host, const char* port) {
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_INET;       
     hints.ai_socktype = SOCK_STREAM; 
-    hints.ai_flags = 0;   
+    hints.ai_flags = flag;   
 
     s = getaddrinfo(host, port, &hints, &this->result);
 
@@ -44,11 +44,11 @@ void Socket::start(const char* host, const char* port) {
 }
 
 Socket::Socket(const char* port) {
-    this->start(NULL, port);
+    this->start(NULL, port, AI_PASSIVE);
 }
 
-Socket::Socket(const char* host, const char* port) {
-    this->start(host, port);
+Socket::Socket(const char* host, const char* port, int flag) {
+    this->start(host, port, AI_PASSIVE);
 }
 
 bool Socket::reciveAll(void* buf, size_t len) {    
@@ -72,15 +72,15 @@ bool Socket::reciveAll(void* buf, size_t len) {
 
 
 int Socket::reciveSome(std::string& str, size_t size) {
-    std::cerr << "size: " << size << '\n';
+    //std::cerr << "size: " << size << '\n';
     char c;
     int recived = 0;
     for (size_t i = 0; i < size; ++i){
         recived = recv(this->current_peerskt, &c , 1, MSG_NOSIGNAL);
         str.append(1, c);
-        fprintf(stderr, "%c", c);
+        //fprintf(stderr, "%c", c);
     }
-    fprintf(stderr, "\n");
+    //fprintf(stderr, "\n");
     //std::cerr << "STRING: " << str << '\n';
     return recived;
 }
@@ -101,11 +101,14 @@ int Socket::sendAll(std::string buf, size_t size) {
 }
 
 int Socket::sendAll(void* buf, size_t size) {
-    //fprintf(stderr, "hola\n");
-    /*char* ptr = (char*) buf;
+    //fprintf(stderr, "Envio\n");
+    /*
+    char* ptr = (char*) buf;
     for (int i = 0; i<(int)size; i++) {
-        fprintf(stderr, "%c - %d\n", ptr[i], (uint8_t)ptr[i]);
-    }*/
+        fprintf(stderr, "%02X\t", (uint8_t)ptr[i]);
+    }
+    fprintf(stderr, "\n");
+    */
     
     int bytes_sent = 0;
     int s = 0;
@@ -116,6 +119,7 @@ int Socket::sendAll(void* buf, size_t size) {
         s = send(this->current_peerskt, &aux[bytes_sent], \
                 size-bytes_sent, MSG_NOSIGNAL);
         if (s <= 0) {
+            printf("Error: %s\n", strerror(errno));
             return -1;
         } else {
             bytes_sent += s;
@@ -161,8 +165,8 @@ bool Socket::connectWithClients() {
 }
 
 void Socket::disableClient() {
-        shutdown(this->current_peerskt, SHUT_RDWR); 
-        close(this->current_peerskt);
+       // shutdown(this->current_peerskt, SHUT_RDWR); 
+        //close(this->current_peerskt);
 }
 
 //-1 si falla

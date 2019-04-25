@@ -126,10 +126,11 @@ int main(int argc, char* argv[]) {
         String my_subject(subject);
         my_subject.recive(skt);
         std::cerr << "Subject: " << subject << '\n';
-        std::cerr << "To: \n";
+
         Key clien_public_key;
         clien_public_key.recive(skt);
         
+
         std::string date_to;
         String my_date_to(date_to);
         my_date_to.recive(skt);
@@ -139,9 +140,7 @@ int main(int argc, char* argv[]) {
         String my_date_from(date_from);
         my_date_from.recive(skt);
         std::cerr << "From: " << date_from << '\n';
-
-
-        std::cerr << "ACA \n";
+       
         /*  
          * Recibo:
          * 

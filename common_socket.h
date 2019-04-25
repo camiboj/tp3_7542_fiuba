@@ -2,6 +2,7 @@
 #define COMMON_SOCKET_H
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string>
 
 class Socket {
     private:
@@ -10,15 +11,15 @@ class Socket {
         int skt;
         int current_peerskt;
         struct addrinfo *result;
-        void start(const char* _host, const char* _port);
+        void start(const char* _host, const char* _port, int flag);
 
     public:
         /*
         * Crea e incializa el socket definiendo la familia, el tipo de socket y el 
         * protocolo para poder conectarse al cliente por medio del port y host indicados
         */
-        Socket(const char* _host, const char* _port);
-        Socket(const char* _port);
+        Socket(const char* _host, const char* _port, int flag);
+        explicit Socket(const char* _port);
         ~Socket();
 
         /*

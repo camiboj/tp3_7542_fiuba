@@ -7,7 +7,7 @@
 class Key {
     private:
         uint8_t public_exponent;   //1 byte
-        uint8_t private_expponent; //1 byte
+        uint8_t private_exponent; //1 byte
         uint16_t module;    //2 bytes
     public:
         Key();
@@ -26,8 +26,8 @@ class Key {
         * Módulo: en formato 2 bytes en big endian sin signo.
         * Exponente: en 1 byte.
         */
-        void send(Socket skt);
-        void recive(Socket skt);
+        void send(Socket& skt);
+        void recive(Socket& skt);
 };
 
 #endif

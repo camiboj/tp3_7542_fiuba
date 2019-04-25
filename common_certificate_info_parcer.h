@@ -12,8 +12,6 @@
 */
 
 class CertificateInfoParcer {
-    private:
-        
     public:
         CertificateInfoParcer(std::string& filename, std::string& subject,\
                              std::string& from, std::string& to);

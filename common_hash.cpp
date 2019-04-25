@@ -1,4 +1,5 @@
 #include "common_hash.h"
+#include <string>
 
 Hash::Hash() {}
 Hash::~Hash() {}

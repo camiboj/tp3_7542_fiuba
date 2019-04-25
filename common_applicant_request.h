@@ -34,7 +34,7 @@ class ApplicantRequest {
          * <date__size>     4 bytes big endian sin signo
          * <dat_to>         String sin ‘\0’
         */
-        void send (Socket skt);
+        void send(Socket skt);
 };
 
 #endif

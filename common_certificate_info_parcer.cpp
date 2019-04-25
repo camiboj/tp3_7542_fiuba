@@ -1,6 +1,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <string>
 #include "common_certificate_info_parcer.h"
 #include "common_time.h"
 
@@ -14,11 +15,9 @@ CertificateInfoParcer::CertificateInfoParcer(std::string& filename, \
     while (std::getline(file, line, '\n')) {
         if (i == 0) {
             subject = line.c_str();
-        } 
-        else if (i == 1) {
+        } else if (i == 1) {
             from = line.c_str();
-        }
-        else if (i == 2) {
+        } else if (i == 2) {
             to = line.c_str();
         }
         ++i;

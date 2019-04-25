@@ -15,10 +15,6 @@ Key::Key(uint8_t _exponent, uint16_t _module):
 */
 Key::Key() {}
 
-void Key::recive(Socket skt) {
-    skt.reciveSome(&this->module, MODULE_LEN);
-    skt.reciveSome(&this->public_exponent, EXPONENT_LEN);
-}
 void Key::set(std::string filename) {
     std::ifstream file;
     file.open(filename); 
@@ -29,7 +25,7 @@ void Key::set(std::string filename) {
         if (i == PUBLIC_EXP_POS) {
             this->public_exponent = (uint8_t) atoi(line.c_str());
         } else if (i == PRIVATE_EXP_POS) {
-            this->private_expponent = (uint8_t) atoi(line.c_str());
+            this->private_exponent = (uint8_t) atoi(line.c_str());
         } else if (i == MODULE_POS) {
             this->module = (uint16_t) atoi(line.c_str());
         }
@@ -41,7 +37,22 @@ void Key::set(std::string filename) {
 
 Key::~Key() {}
 
-void Key::send(Socket skt) {
-    skt.sendAll(&this->public_exponent, EXPONENT_LEN);
-    skt.sendAll(&this->module, MODULE_LEN);
+void Key::recive(Socket& skt) {
+    skt.reciveSome(&this->public_exponent, EXPONENT_LEN);
+    uint16_t aux;
+    skt.reciveSome(&aux, MODULE_LEN);
+    this->module = htobe16(aux);
 }
+
+void Key::send(Socket& skt) {
+    skt.sendAll(&this->public_exponent, EXPONENT_LEN);
+    
+    uint16_t aux = htobe16(this->module);
+    skt.sendAll(&aux, MODULE_LEN);
+}
+
+/*********  PRINT   **************************
+    std::cerr << "\tKEY:\n";
+    fprintf(stderr,"< %d > < %d >\n", this->public_exponent, this->module);
+    
+*/

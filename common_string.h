@@ -14,10 +14,10 @@ class String {
         std::string& str;
         uint32_t len;
     public:
-        String(std::string& _str);
+        explicit String(std::string& _str);
         ~String();
-        void send(Socket skt);
-        void recive(Socket skt);
+        void send(Socket& skt);
+        void recive(Socket& skt);
 };
 
 #endif
