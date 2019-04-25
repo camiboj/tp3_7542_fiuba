@@ -25,7 +25,7 @@ CertificateInfoParcer::CertificateInfoParcer(std::string& filename, \
     if (i == 1) {
         Time tm;
         tm.toString(from);
-        tm.plusMonth();
+        tm.validTo();
         tm.toString(to);
     }
 }

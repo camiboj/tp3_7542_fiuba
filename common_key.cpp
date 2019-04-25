@@ -42,6 +42,8 @@ void Key::recive(Socket& skt) {
     uint16_t aux;
     skt.reciveSome(&aux, MODULE_LEN);
     this->module = htobe16(aux);
+    std::cerr << "KEY:\t";
+    fprintf(stderr,"< %d > < %d >\n", this->public_exponent, this->module);
 }
 
 void Key::send(Socket& skt) {

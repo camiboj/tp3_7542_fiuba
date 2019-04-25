@@ -19,6 +19,8 @@ class ApplicantRequest {
         * Recibe los dos archivos necesarios para solicitar un nuevo aplicante
         */
         ApplicantRequest(std::string& cert_filename, std::string& key_filename);
+        ApplicantRequest();
+        
         ~ApplicantRequest();
         /*  
          * Envia a traves del socket recibido por parametro una solucitud con
@@ -34,7 +36,8 @@ class ApplicantRequest {
          * <date__size>     4 bytes big endian sin signo
          * <dat_to>         String sin ‘\0’
         */
-        void send(Socket skt);
+        void recive(Socket& skt);
+        void send(Socket& skt);
 };
 
 #endif

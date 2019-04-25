@@ -1,8 +1,6 @@
 #include <string>
 #include <iostream>
-#include "common_socket.h"
-#include "common_string.h"
-#include "common_key.h"
+#include "common_applicant_request.h"
 #define ERROR_CODE 1
 #define COMMAND_SIZE 1
 #define LEN_SIZE 4
@@ -122,24 +120,8 @@ int main(int argc, char* argv[]) {
     //skt.receiveSome(&command, COMMAND_SIZE);
     if (command == 0) {
         //std::cerr << "ACA \n";
-        std::string subject;
-        String my_subject(subject);
-        my_subject.recive(skt);
-        std::cerr << "Subject: " << subject << '\n';
-
-        Key clien_public_key;
-        clien_public_key.recive(skt);
-        
-
-        std::string date_to;
-        String my_date_to(date_to);
-        my_date_to.recive(skt);
-        std::cerr << "To: " << date_to << '\n';
-
-        std::string date_from;
-        String my_date_from(date_from);
-        my_date_from.recive(skt);
-        std::cerr << "From: " << date_from << '\n';
+        ApplicantRequest ap;
+        ap.recive(skt);
        
         /*  
          * Recibo:

@@ -9,7 +9,7 @@ Time::Time() {
 	this->date = std::chrono::system_clock::now();
 }
 
-void Time::plusMonth() {
+void Time::validTo() {
     // common_time.cpp:18:  Consider using ctime_r(...) instead of ctime(...)
     // for improved thread safety.  [runtime/threadsafe_fn] [2]
     std::chrono::duration<int,std::ratio<60*60*60*24> > month(1);

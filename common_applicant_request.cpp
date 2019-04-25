@@ -14,10 +14,10 @@ ApplicantRequest::ApplicantRequest(std::string& cert_filename,\
         CertificateInfoParcer cir(cert_filename, this->subject, \
                                   this->date_from, this->date_to);
 }
+ApplicantRequest::ApplicantRequest() {}
+ApplicantRequest::~ApplicantRequest() {}
 
-ApplicantRequest::~ApplicantRequest(){}
-
-void ApplicantRequest::send(Socket skt) {
+void ApplicantRequest::send(Socket& skt) {
     uint8_t command = 0;
     String sub_aux(this->subject);
     String from(this->date_from);
@@ -25,9 +25,24 @@ void ApplicantRequest::send(Socket skt) {
 
     skt.sendAll(&command, COMMAND_SIZE);
     sub_aux.send(skt);
-    //std::cerr << "Por aca\n";
     key.send(skt);
     from.send(skt);
-    //from.send(skt);
     to.send(skt);
+}
+
+void ApplicantRequest::recive(Socket& skt) {
+        String my_subject(this->subject);
+        my_subject.recive(skt);
+        std::cerr << "Subject: " << this->subject << '\n';
+
+        Key clien_public_key;
+        clien_public_key.recive(skt);
+        
+        String my_date_to(this->date_from);
+        my_date_to.recive(skt);
+        std::cerr << "To: " << this->date_from << '\n';
+
+        String my_date_from(this->date_to);
+        my_date_from.recive(skt);
+        std::cerr << "From: " << this->date_to << '\n';
 }

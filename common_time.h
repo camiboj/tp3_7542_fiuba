@@ -15,9 +15,9 @@ class Time {
         //Time(std::string filename, std::string& to, std::string& from);
         
         /*
-         * Le suma 30 dias a la fecha actual.
+         * Le suma 60 dias a la fecha actual.
         */
-        void plusMonth();
+        void validTo();
         /*
          * Almacena en str la fecha en formato MMM DD HH:mm:SS YYYY
         */
