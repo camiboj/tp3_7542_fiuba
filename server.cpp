@@ -1,6 +1,8 @@
 #include <string>
 #include <iostream>
 #include "common_applicant_request.h"
+#include "server_index.h"
+
 #define ERROR_CODE 1
 #define COMMAND_SIZE 1
 #define LEN_SIZE 4
@@ -112,9 +114,12 @@ int main(int argc, char* argv[]) {
     
     Socket skt(argv[1]);
     skt.connectWithClients();
+    skt.acceptClient();
+    
+    std::string index_filename(argv[3]);
+    Index index(index_filename);
 
     uint8_t command;
-    skt.acceptClient();
     skt.reciveSome(&command, COMMAND_SIZE);
     //fprintf(stderr, "Command: %d\n", command);
     //skt.receiveSome(&command, COMMAND_SIZE);
@@ -122,7 +127,7 @@ int main(int argc, char* argv[]) {
         //std::cerr << "ACA \n";
         ApplicantRequest ap;
         ap.recive(skt);
-       
+
         /*  
          * Recibo:
          * 

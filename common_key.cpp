@@ -9,10 +9,12 @@
 #define PRIVATE_EXP_POS 1
 #define MODULE_POS 2
 
-/*
-Key::Key(uint8_t _exponent, uint16_t _module):
-    exponent(_exponent), module(_module) {}
-*/
+
+Key::Key(std::string _public_exponent, std::string _module) {
+    this->public_exponent = (uint8_t) atoi(_public_exponent.c_str());
+    this->module = (uint8_t) atoi(_module.c_str());
+}
+
 Key::Key() {}
 
 void Key::set(std::string filename) {

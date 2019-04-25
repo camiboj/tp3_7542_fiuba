@@ -2,6 +2,7 @@
 #define COMMON_KEY_H
 #include <stdint.h>
 #include <string>
+#include <queue>
 #include "common_socket.h"
 
 class Key {
@@ -11,7 +12,7 @@ class Key {
         uint16_t module;    //2 bytes
     public:
         Key();
-        //Key(uint8_t _exponent, uint16_t _module);
+        Key(std::string _public_exponent, std::string _module);
         ~Key();
         /*
          * Recibe el nombre de un archivo de tipo
