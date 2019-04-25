@@ -1,5 +1,5 @@
-#ifndef COMMON_APPLICANT_REQUEST_H
-#define COMMON_APPLICANT_REQUEST_H
+#ifndef CLIENT_APPLICANT_REQUEST_H
+#define CLIENT_APPLICANT_REQUEST_H
 #include <stdint.h>
 #include <string>
 #include "common_socket.h"
@@ -19,7 +19,6 @@ class ApplicantRequest {
         * Recibe los dos archivos necesarios para solicitar un nuevo aplicante
         */
         ApplicantRequest(std::string& cert_filename, std::string& key_filename);
-        ApplicantRequest();
         
         ~ApplicantRequest();
         /*  
@@ -36,7 +35,6 @@ class ApplicantRequest {
          * <date__size>     4 bytes big endian sin signo
          * <dat_to>         String sin ‘\0’
         */
-        void recive(Socket& skt);
         void send(Socket& skt);
 };
 

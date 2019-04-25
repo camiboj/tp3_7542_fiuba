@@ -12,6 +12,7 @@ class Key {
         uint16_t module;    //2 bytes
     public:
         Key();
+        Key (const Key &self);
         Key(std::string _public_exponent, std::string _module);
         ~Key();
         /*
@@ -29,6 +30,7 @@ class Key {
         */
         void send(Socket& skt);
         void recive(Socket& skt);
+        friend std::ostream& operator<<(std::ostream&, const Key&);
 };
 
 #endif

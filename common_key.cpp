@@ -36,6 +36,11 @@ void Key::set(std::string filename) {
     //file.close();
 }
 
+Key::Key (const Key &key) {
+    this->private_exponent = key.private_exponent;
+    this->public_exponent = key.public_exponent;
+    this->module = key.module;
+}
 
 Key::~Key() {}
 
@@ -44,7 +49,7 @@ void Key::recive(Socket& skt) {
     uint16_t aux;
     skt.reciveSome(&aux, MODULE_LEN);
     this->module = htobe16(aux);
-    std::cerr << "KEY:\t";
+    std::cerr << "KEY in reive:\t";
     fprintf(stderr,"< %d > < %d >\n", this->public_exponent, this->module);
 }
 
@@ -55,6 +60,17 @@ void Key::send(Socket& skt) {
     skt.sendAll(&aux, MODULE_LEN);
 }
 
+std::ostream& operator<<(std::ostream& o, const Key& self) {
+    std::cerr << "KEY operator << :\t";
+    fprintf(stderr,"< %d > < %d >\n", self.public_exponent, self.module);
+    std::string s = std::to_string(self.public_exponent);
+    //std::cerr << "S: " << s << '\n';
+    o << s << ' ';
+    s = std::to_string(self.module);
+    //std::cerr << "S: " << s << '\n';
+    o << s;
+    return o;
+}
 /*********  PRINT   **************************
     std::cerr << "\tKEY:\n";
     fprintf(stderr,"< %d > < %d >\n", this->public_exponent, this->module);

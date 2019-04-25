@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 #include "common_socket.h"
-#include "common_applicant_request.h"
+#include "client_applicant_request.h"
 #define ARGUMENT_ERROR_MSSG "Error: argumentos invalidos.\n"
 #define ARGUMENT_ERROR 0
 #define USER_ERROR_MSSG "Error: usuario no registrado.\n"
@@ -145,6 +145,12 @@ int main(int argc, char* argv[]) {
         ApplicantRequest request(certificate_information_filename,\
                                  client_key_filename);
         request.send(skt);
+        uint8_t answer;
+        skt.reciveAll(&answer, 1);
+        if (answer == 0) {
+            std::cout << CERTIFICATE_ERROR_MSSG;
+        }
+
     }
     
     return 0;

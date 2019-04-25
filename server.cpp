@@ -1,6 +1,6 @@
 #include <string>
 #include <iostream>
-#include "common_applicant_request.h"
+#include "server_applicant_request.h"
 #include "server_index.h"
 
 #define ERROR_CODE 1
@@ -119,15 +119,18 @@ int main(int argc, char* argv[]) {
     std::string index_filename(argv[3]);
     Index index(index_filename);
 
+    int s;
     uint8_t command;
     skt.reciveSome(&command, COMMAND_SIZE);
     //fprintf(stderr, "Command: %d\n", command);
     //skt.receiveSome(&command, COMMAND_SIZE);
     if (command == 0) {
         //std::cerr << "ACA \n";
-        ApplicantRequest ap;
-        ap.recive(skt);
-
+        ApplicantRequest ap(index);
+        s = ap.recive(skt);
+        if (!s) {
+            return 1;
+        }
         /*  
          * Recibo:
          * 
@@ -142,6 +145,7 @@ int main(int argc, char* argv[]) {
         */
     }
 
+    index.write();
     /*
     char* port = argv[1];
     char* client_key_filename = argv[4];
