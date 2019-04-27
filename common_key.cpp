@@ -53,10 +53,12 @@ void Key::recive(Socket& skt) {
 }
 
 void Key::send(Socket& skt) {
-    skt.sendAll(&this->public_exponent, EXPONENT_SIZE);
+    skt.sendNumber(this->public_exponent);
+    skt.sendNumber(this->module);
+    //skt.sendAll(&this->public_exponent, EXPONENT_SIZE);
     
-    uint16_t aux = htobe16(this->module);
-    skt.sendAll(&aux, MODULE_SIZE);
+    //uint16_t aux = htobe16(this->module);
+    //skt.sendAll(&aux, MODULE_SIZE);
 }
 
 std::ostream& operator<<(std::ostream& o, const Key& self) {

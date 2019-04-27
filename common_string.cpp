@@ -19,8 +19,9 @@ void String::recive(Socket& skt) {
 }
 
 void String::send(Socket& skt) {
-    uint32_t aux = htobe32(this->len);
-    skt.sendAll(&aux, LEN_SIZE);
+    //uint32_t aux = htobe32(this->len);
+    //skt.sendAll(&aux, LEN_SIZE);
+    skt.sendNumber(this->len);
     skt.sendAll(this->str, str.length());
     //no mandar el /0 !!!
     //igual, si itero hasta length no deberia mandarlo

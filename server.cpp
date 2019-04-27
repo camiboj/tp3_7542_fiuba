@@ -137,37 +137,13 @@ int main(int argc, char* argv[]) {
 
     Key key;
     key.set(argv[2]);
-
-    //fprintf(stderr, "Command: %d\n", command);
-    //skt.receiveSome(&command, COMMAND_SIZE);
     if (command == 0) {
-        //std::cerr << "ACA \n";
         NewClientProcessor ap(index, key);
         s = ap.run(skt);
         if (!s) {
             return 1;
         }
-        /*  
-         * Recibo:
-         * 
-         * <subject__size>  4 bytes big endian sin signo
-         * <subject>        String sin ‘\0’
-         * <module>          2 bytes big endian sin signo
-         * <exponent>       1 byte
-         * <date__size>     4 bytes big endian sin signo
-         * <date_from>      String sin ‘\0’
-         * <date__size>     4 bytes big endian sin signo
-         * <dat_to>         String sin ‘\0’
-        */
     }
-
-    index.write();
-    /*
-    char* port = argv[1];
-    char* client_key_filename = argv[4];
-    char* server_key_filename = argv[5];
-    char* certificate = argv[6];
-    */
-    
+    index.write();    
     return 0;
 }

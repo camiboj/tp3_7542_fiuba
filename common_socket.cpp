@@ -15,6 +15,9 @@
 #include "common_socket.h"
 
 #define MAX_WAITING_CLIENTS 20
+#define UINT8_SIZE 1
+#define UINT16_SIZE 2
+#define UINT32_SIZE 4
 
 
 /******************************************************************************
@@ -89,6 +92,19 @@ int Socket::reciveSome(void* buf, size_t size) {
     return recv(this->current_peerskt, buf , size, MSG_NOSIGNAL);
 }
 
+void Socket::sendNumber(uint8_t n) {
+    this->sendAll(&n, UINT8_SIZE);
+}
+
+void Socket::sendNumber(uint16_t n) {
+    uint16_t aux = htobe16(n);
+    this->sendAll(&aux, UINT16_SIZE);
+}
+
+void Socket::sendNumber(uint32_t n) {
+    uint32_t aux = htobe32(n);
+    this->sendAll(&aux, UINT32_SIZE);
+}
 
 int Socket::sendAll(std::string buf, size_t size) {  
     // Opcion 1: strcopy

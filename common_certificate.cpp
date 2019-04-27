@@ -53,7 +53,8 @@ void Certificate::send(Socket& skt) {
     String from(this->not_before);
     String to(this->not_after);
 
-    skt.sendAll(&serial_number, SN_SIZE);
+    skt.sendNumber(serial_number);
+    //skt.sendAll(&serial_number, SN_SIZE);
     sbj.send(skt);
     from.send(skt);
     to.send(skt);

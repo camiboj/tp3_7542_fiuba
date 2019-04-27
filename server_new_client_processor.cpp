@@ -73,11 +73,13 @@ bool NewClientProcessor::checkCertificate(Socket& skt) {
     uint8_t answer = CERTIFICATE_OK;
     if (index.hasCertificate(this->subject)) {
         answer = CERTIFICATE_ERROR;
-        skt.sendAll(&answer, CERT_STATUS_SIZE);
+        //skt.sendAll(&answer, CERT_STATUS_SIZE);
+        skt.sendNumber(answer);
         //trow algo;
         return false;
     } 
-    skt.sendAll(&answer, 1);
+    //skt.sendAll(&answer, 1);
+    skt.sendNumber(answer);
     return true;
 }
 
@@ -99,12 +101,17 @@ int NewClientProcessor::run(Socket& skt) {
     uint32_t encryption = encrypt(this->client_key, this->server_key,\
                                  hashed_certificate);
 
-    hashed_certificate = htobe32(hashed_certificate);
-    skt.sendAll(&hashed_certificate, ENCRYPTION_SIZE);
+    std::cout << "Certificado: " << encryption << '\n';
+    std::cout << "Hash: " << hashed_certificate << '\n';
+    //hashed_certificate = htobe32(hashed_certificate);
+    //skt.sendAll(&hashed_certificate, ENCRYPTION_SIZE);
+    skt.sendNumber(hashed_certificate);
+    //encryption = htobe32(encryption);
+    //skt.sendAll(&encryption, ENCRYPTION_SIZE);
+    skt.sendNumber(encryption);
+    std::cout << "Certificado: " << encryption << '\n';
+    std::cout << "Hash: " << hashed_certificate << '\n';
     
-    encryption = htobe32(encryption);
-    skt.sendAll(&encryption, ENCRYPTION_SIZE);
-
     uint8_t hash_status;
     skt.reciveAll(&hash_status, HASH_STATUS_SIZE);
     if (hash_status == HASH_ERROR) {

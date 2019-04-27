@@ -21,8 +21,9 @@ void ApplicantRequest::send(Socket& skt) {
     String sub_aux(this->subject);
     String from(this->date_from);
     String to(this->date_to);
-
-    skt.sendAll(&command, COMMAND_SIZE);
+    
+    //skt.sendAll(&command, COMMAND_SIZE);
+    skt.sendNumber(command);
     sub_aux.send(skt);
     key.send(skt);
     from.send(skt);
