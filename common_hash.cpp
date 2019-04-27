@@ -1,16 +1,21 @@
-#include "common_hash.h"
 #include <string>
+#include <iostream>
+#include "common_hash.h"
+#define INITIAL_COUNT 0
 
-Hash::Hash() {}
+Hash::Hash() {
+    this->count = INITIAL_COUNT;
+}
 Hash::~Hash() {}
 
-void Hash::load(std::string str) {
-    std::string::iterator it=str.begin();
+Hash::Hash(std::string str) {
+    this->count = INITIAL_COUNT;
+    std::string::iterator it = str.begin();
     for (; it!=str.end(); ++it) {
         this->count += (uint8_t)*it;
     }
 }
 
-uint16_t Hash::operator()() {
+uint32_t Hash::operator()() {
     return this->count;
 }

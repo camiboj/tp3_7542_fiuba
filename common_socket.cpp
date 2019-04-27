@@ -89,6 +89,7 @@ int Socket::reciveSome(void* buf, size_t size) {
     return recv(this->current_peerskt, buf , size, MSG_NOSIGNAL);
 }
 
+
 int Socket::sendAll(std::string buf, size_t size) {  
     // Opcion 1: strcopy
     // Opcion 2: repetir el código de la de abajo.  

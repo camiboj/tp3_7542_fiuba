@@ -1,6 +1,6 @@
 #include <string>
 #include <iostream>
-#include "server_applicant_request.h"
+#include "server_new_client_processor.h"
 #include "server_index.h"
 
 #define ERROR_CODE 1
@@ -36,6 +36,19 @@
  * <subjects 1>; <exp_publico> <modulo>
  * 
  * Se recomienda investigar la libreria fstream, en particular el operador >>
+*/
+
+/******************************************************************************
+ * certificate:
+ *    serial number: 1 (0x00000001)
+ *    subject: Federico Manuel Gomez Peter
+ *    issuer: Taller de programacion 1
+ *    validity:
+ *        not before: Mar 28 21:33:04 2019
+ *        not after: May 27 21:33:04 2019
+ *    subject public key info:
+ *    modulus: 253 (0x00fd)
+ *    exponent: 19 (0x13)
 */
 
 
@@ -107,7 +120,6 @@ int main(int argc, char* argv[]) {
     std::string claves = std::string(argv[2]);
     std::string indice = std::string(argv[3]);
      if (argc !=4) {
-	    fprintf(stderr, "Uso:\n./server <puerto> <input> [<template>]\n");
 	    return 1;
     }
 
@@ -122,12 +134,16 @@ int main(int argc, char* argv[]) {
     int s;
     uint8_t command;
     skt.reciveSome(&command, COMMAND_SIZE);
+
+    Key key;
+    key.set(argv[2]);
+
     //fprintf(stderr, "Command: %d\n", command);
     //skt.receiveSome(&command, COMMAND_SIZE);
     if (command == 0) {
         //std::cerr << "ACA \n";
-        ApplicantRequest ap(index);
-        s = ap.recive(skt);
+        NewClientProcessor ap(index, key);
+        s = ap.run(skt);
         if (!s) {
             return 1;
         }

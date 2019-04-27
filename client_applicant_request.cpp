@@ -28,3 +28,7 @@ void ApplicantRequest::send(Socket& skt) {
     from.send(skt);
     to.send(skt);
 }
+
+std::string ApplicantRequest::getSubject(){
+    return this->subject;
+}

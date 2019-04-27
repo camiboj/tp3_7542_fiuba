@@ -1,8 +1,12 @@
 
 #include <iostream>
+#include <ostream>
+#include <fstream>
 #include <string>
+#include "common_certificate.h"
 #include "common_socket.h"
 #include "client_applicant_request.h"
+#include "common_hash.h"
 #define ARGUMENT_ERROR_MSSG "Error: argumentos invalidos.\n"
 #define ARGUMENT_ERROR 0
 #define USER_ERROR_MSSG "Error: usuario no registrado.\n"
@@ -11,6 +15,12 @@
 #define CERTIFICATE_ERROR 0
 #define HASH_ERROR_MSSG "Error: los hashes no coinciden.\n"
 #define HASH_ERROR 0
+#define CF_SIZE 4 //certificate footprint size in bytes
+#define HASH_SIZE 4
+#define NOTIFICATION_SIZE 1
+#define CERT_FP "Huella del servidor: "
+#define SH "Hash del servidor: "
+#define MH "Hash calculado: "
 
 /********************************** COMANDOS *********************************/
 
@@ -149,8 +159,47 @@ int main(int argc, char* argv[]) {
         skt.reciveAll(&answer, 1);
         if (answer == 0) {
             std::cout << CERTIFICATE_ERROR_MSSG;
+            return CERTIFICATE_ERROR;
         }
 
+        Certificate certificate;
+        certificate.recive(skt);
+        std::string formal_certificate;
+        formal_certificate = certificate.toString();
+
+
+        Hash hash(formal_certificate);
+        uint32_t my_hash =  hash();
+        
+
+        uint32_t server_hash;
+        skt.reciveSome(&server_hash, HASH_SIZE);
+        server_hash = htobe32(server_hash);
+
+        uint32_t certificate_footprint;
+        skt.reciveSome(&certificate_footprint, CF_SIZE);
+        certificate_footprint = htobe32(certificate_footprint);
+
+        uint8_t notification;
+        if (my_hash != server_hash) {
+            notification = 1;
+            skt.sendAll(&notification, NOTIFICATION_SIZE);    
+            std::cout << HASH_ERROR_MSSG;
+            return HASH_ERROR;
+        }
+        skt.sendAll(&notification, NOTIFICATION_SIZE);
+        std::cout << CERT_FP << certificate_footprint << '\n';
+        std::cout << SH << server_hash << '\n';
+        std::cout << MH << my_hash << '\n';
+
+        std::string filename = request.getSubject();
+        std::ofstream file;
+        file.open(filename, std::ofstream::out | std::ofstream::trunc);
+    
+        if (!file.is_open()) {
+            //exc
+        }
+        file << formal_certificate;
     }
     
     return 0;

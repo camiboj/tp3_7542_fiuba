@@ -8,10 +8,11 @@
 */
 class Hash {
     private:
-        uint16_t count;
+        uint32_t count;
     
     public:
         Hash();
+        explicit Hash(std::string str);
         ~Hash();
         
         /*
@@ -23,7 +24,7 @@ class Hash {
         * Devuelve el resultado (entero de 2 bytes) de hashear el texto 
         * completo.
         */
-        uint16_t operator()();    
+        uint32_t operator()();    
 };
 
 #endif

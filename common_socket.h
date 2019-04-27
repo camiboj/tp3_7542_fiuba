@@ -35,6 +35,7 @@ class Socket {
         int reciveSome(std::string& str, size_t size);
         int reciveSome(void* buf, size_t size);
 
+        
         int sendAll(void* buf, size_t size);
         int sendAll(std::string buf, size_t size);
         

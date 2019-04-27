@@ -36,6 +36,7 @@ class ApplicantRequest {
          * <dat_to>         String sin ‘\0’
         */
         void send(Socket& skt);
+        std::string getSubject();
 };
 
 #endif
