@@ -49,28 +49,19 @@ Certificate::Certificate(std::string _subject, std::string _not_before, \
  * module:          2 bytes
 */
 void Certificate::send(Socket& skt) {
-    String sbj(this->subject);
-    String from(this->not_before);
-    String to(this->not_after);
-
     skt.sendNumber(serial_number);
-    //skt.sendAll(&serial_number, SN_SIZE);
-    sbj.send(skt);
-    from.send(skt);
-    to.send(skt);
-    key.send(skt);
+    skt.sendAll(this->subject);
+    skt.sendAll(this->not_before);
+    skt.sendAll(this->not_after);
+    this->key.send(skt);
 }
 
 
 void Certificate::recive(Socket& skt) {
-    String sbj(this->subject);
-    String from(this->not_before);
-    String to(this->not_after);
-    
-    skt.reciveAll(&serial_number, SN_SIZE);
-    sbj.recive(skt);        
-    from.recive(skt);
-    to.recive(skt);
+    skt.reciveNumber(&serial_number);
+    skt.reciveAll(this->subject);
+    skt.reciveAll(this->not_before);
+    skt.reciveAll(this->not_after);
     this->key.recive(skt);
 }
 
@@ -93,7 +84,6 @@ std::string toHexaString(int n, int len) {
 std::string Certificate::toString() {
     std::string o;
     o += std::string(CERTIFICATE);
-    //std::cerr << "sn: " << this->serial_number << '\n';
     int n = (int) this->serial_number + 1;
     std::string sn = toHexaString(n, SN_SIZE);
     o += SERIAL_NUMBER + std::to_string(n) + ' ' + sn + '\n';

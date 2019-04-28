@@ -7,7 +7,6 @@
 
 class Index {
     private:
-        uint32_t  serial_number;
         std::string& filename;
         std::map<std::string, Key> certificates;
         void parseLine(std::string& line);

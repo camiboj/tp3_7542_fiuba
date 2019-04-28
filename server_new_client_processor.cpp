@@ -48,16 +48,18 @@ NewClientProcessor::NewClientProcessor(Index& _index, Key key) :
 NewClientProcessor::~NewClientProcessor() {}
 
 void NewClientProcessor::reciveInfo(Socket& skt) {
-    String my_subject(this->subject);
-    my_subject.recive(skt);
-
+    //String my_subject(this->subject);
+    //my_subject.recive(skt);
+    skt.reciveAll(this->subject);
     this->client_key.recive(skt);
     
-    String my_date_from(this->date_from);
-    my_date_from.recive(skt);
+    //String my_date_from(this->date_from);
+    //my_date_from.recive(skt);
+    skt.reciveAll(this->date_from);
 
-    String my_date_to(this->date_to);
-    my_date_to.recive(skt);
+    //String my_date_to(this->date_to);
+    //my_date_to.recive(skt);
+    skt.reciveAll(this->date_to);
 }
 
 std::string NewClientProcessor::createCertificate(Socket& skt) {
@@ -73,12 +75,10 @@ bool NewClientProcessor::checkCertificate(Socket& skt) {
     uint8_t answer = CERTIFICATE_OK;
     if (index.hasCertificate(this->subject)) {
         answer = CERTIFICATE_ERROR;
-        //skt.sendAll(&answer, CERT_STATUS_SIZE);
         skt.sendNumber(answer);
         //trow algo;
         return false;
     } 
-    //skt.sendAll(&answer, 1);
     skt.sendNumber(answer);
     return true;
 }
@@ -101,19 +101,11 @@ int NewClientProcessor::run(Socket& skt) {
     uint32_t encryption = encrypt(this->client_key, this->server_key,\
                                  hashed_certificate);
 
-    std::cout << "Certificado: " << encryption << '\n';
-    std::cout << "Hash: " << hashed_certificate << '\n';
-    //hashed_certificate = htobe32(hashed_certificate);
-    //skt.sendAll(&hashed_certificate, ENCRYPTION_SIZE);
     skt.sendNumber(hashed_certificate);
-    //encryption = htobe32(encryption);
-    //skt.sendAll(&encryption, ENCRYPTION_SIZE);
     skt.sendNumber(encryption);
-    std::cout << "Certificado: " << encryption << '\n';
-    std::cout << "Hash: " << hashed_certificate << '\n';
     
-    uint8_t hash_status;
-    skt.reciveAll(&hash_status, HASH_STATUS_SIZE);
+    uint8_t hash_status = 0;
+    skt.reciveNumber(&hash_status);
     if (hash_status == HASH_ERROR) {
         index.erase(this->subject);
     }

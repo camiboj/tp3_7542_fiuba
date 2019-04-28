@@ -30,16 +30,19 @@ class Socket {
 
         int acceptClient();
 
+        void reciveNumber(uint8_t* n);
+        void reciveNumber(uint16_t* n);
+        void reciveNumber(uint32_t* n);
         
         bool reciveAll(void* buf, size_t len);
-        int reciveSome(std::string& str, size_t size);
+        int reciveAll(std::string& str);
         int reciveSome(void* buf, size_t size);
 
         void sendNumber(uint8_t n);
         void sendNumber(uint16_t n);
         void sendNumber(uint32_t n);
         int sendAll(void* buf, size_t size);
-        int sendAll(std::string buf, size_t size);
+        int sendAll(std::string str);
         
         /*
         * Desactiva las operaciones de envío y recepción para el cliente y para si mismo

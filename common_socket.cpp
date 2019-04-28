@@ -74,18 +74,34 @@ bool Socket::reciveAll(void* buf, size_t len) {
 }
 
 
-int Socket::reciveSome(std::string& str, size_t size) {
-    //std::cerr << "size: " << size << '\n';
+int Socket::reciveAll(std::string& str) {
+    uint32_t len = (uint32_t) str.length();
+    this->reciveNumber(&len);
     char c;
     int recived = 0;
-    for (size_t i = 0; i < size; ++i){
+    for (size_t i = 0; i < len; ++i){
         recived = recv(this->current_peerskt, &c , 1, MSG_NOSIGNAL);
         str.append(1, c);
-        //fprintf(stderr, "%c", c);
     }
-    //fprintf(stderr, "\n");
-    //std::cerr << "STRING: " << str << '\n';
     return recived;
+}
+
+void Socket::reciveNumber(uint8_t* n) {
+    this->reciveAll(n, UINT8_SIZE);
+}
+
+
+void Socket::reciveNumber(uint16_t* n) {
+    uint16_t aux;
+    this->reciveAll(&aux, UINT16_SIZE);
+    *n = htobe16(aux);
+}
+
+
+void Socket::reciveNumber(uint32_t* n) {
+    uint32_t aux;
+    this->reciveAll(&aux, UINT32_SIZE);
+    *n = htobe32(aux);
 }
 
 int Socket::reciveSome(void* buf, size_t size) {
@@ -106,13 +122,12 @@ void Socket::sendNumber(uint32_t n) {
     this->sendAll(&aux, UINT32_SIZE);
 }
 
-int Socket::sendAll(std::string buf, size_t size) {  
-    // Opcion 1: strcopy
-    // Opcion 2: repetir el código de la de abajo.  
+int Socket::sendAll(std::string str) {  
+    uint32_t len = (uint32_t) str.length();
+    this->sendNumber(len);
     int sent = 0;
-    for (size_t i = 0; i < size && sent >= 0; ++i){
-        //fprintf(stderr, "%c \n", buf[i]);
-        sent = this->sendAll(&buf[i], 1);
+    for (size_t i = 0; i < len && sent >= 0; ++i){
+        sent = this->sendAll(&str[i], 1);
     }
     return sent;
 }

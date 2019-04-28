@@ -13,7 +13,7 @@
 #define USER_ERROR 0
 #define CERTIFICATE_ERROR_MSSG "Error: ya existe un certificado.\n"
 #define CERTIFICATE_ERROR 0
-#define CERIFICATE_ERRPOR_RECIVED_MSSG 0
+#define CERIFICATE_ERROR_RECIVED_MSSG 0
 #define HASH_ERROR_MSSG "Error: los hashes no coinciden.\n"
 #define HASH_ERROR 0
 #define HASH_ERROR_SERVER_MSSG 1
@@ -158,9 +158,9 @@ int main(int argc, char* argv[]) {
         ApplicantRequest request(certificate_information_filename,\
                                  client_key_filename);
         request.send(skt);
-        uint8_t answer;
-        skt.reciveAll(&answer, 1);
-        if (answer == CERIFICATE_ERRPOR_RECIVED_MSSG) {
+        uint8_t answer = 1;
+        skt.reciveNumber(&answer);
+        if (answer == CERIFICATE_ERROR_RECIVED_MSSG) {
             std::cout << CERTIFICATE_ERROR_MSSG;
             return CERTIFICATE_ERROR;
         }
@@ -175,23 +175,19 @@ int main(int argc, char* argv[]) {
         uint32_t my_hash =  hash();
         
 
-        uint32_t server_hash;
-        skt.reciveSome(&server_hash, HASH_SIZE);
-        server_hash = htobe32(server_hash);
-
-        uint32_t certificate_footprint;
-        skt.reciveSome(&certificate_footprint, CF_SIZE);
-        certificate_footprint = htobe32(certificate_footprint);
+        uint32_t server_hash = 0;
+        skt.reciveNumber(&server_hash);
+        
+        uint32_t certificate_footprint = 0;
+        skt.reciveNumber(&certificate_footprint);
 
         uint8_t notification = HASH_OK_SERVER_MSSG;
         if (my_hash != server_hash) {
             notification = HASH_ERROR_SERVER_MSSG;
-            //skt.sendAll(&notification, NOTIFICATION_SIZE);    
             skt.sendNumber(notification);
             std::cout << HASH_ERROR_MSSG;
             return HASH_ERROR;
         }
-        //skt.sendAll(&notification, NOTIFICATION_SIZE);
         skt.sendNumber(notification);
         std::cout << CERT_FP << certificate_footprint << '\n';
         std::cout << SH << server_hash << '\n';
@@ -209,6 +205,6 @@ int main(int argc, char* argv[]) {
 
     if (mode == mode1) {   
     }
-    
+
     return 0;
 }

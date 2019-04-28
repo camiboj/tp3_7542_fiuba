@@ -123,13 +123,13 @@ int main(int argc, char* argv[]) {
 	    return 1;
     }
 
-    
     Socket skt(argv[1]);
     skt.connectWithClients();
     skt.acceptClient();
     
     std::string index_filename(argv[3]);
     Index index(index_filename);
+    //std::cout << "sali \n";
 
     int s;
     uint8_t command;

@@ -18,16 +18,20 @@ ApplicantRequest::~ApplicantRequest() {}
 
 void ApplicantRequest::send(Socket& skt) {
     uint8_t command = 0;
-    String sub_aux(this->subject);
-    String from(this->date_from);
-    String to(this->date_to);
+    //String sub_aux(this->subject);
+    //String from(this->date_from);
+    //String to(this->date_to);
     
     //skt.sendAll(&command, COMMAND_SIZE);
     skt.sendNumber(command);
-    sub_aux.send(skt);
+    skt.sendAll(this->subject);
     key.send(skt);
-    from.send(skt);
-    to.send(skt);
+    skt.sendAll(this->date_from);
+    skt.sendAll(this->date_to);
+    //sub_aux.send(skt);
+    
+    //from.send(skt);
+    //to.send(skt);
 }
 
 std::string ApplicantRequest::getSubject(){

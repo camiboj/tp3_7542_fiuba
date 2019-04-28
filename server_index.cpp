@@ -20,8 +20,6 @@ Index::Index(std::string& _filename) : filename(_filename) {
     file.open(filename); 
     std::string line;
     std::getline(file, line, '\n');
-    this->serial_number = (uint32_t) atoi(line.c_str());
-    //if (this->serial_number == 0) this->serial_number = 1;
     while (std::getline(file, line, '\n')) {
         this->parseLine(line);
     }
@@ -71,16 +69,12 @@ bool Index::hasCertificate(std::string str) {
 
 void Index::saveCertificate(std::string subj, Key& key, \
                             Certificate& certificate) {
-    //std::cerr << "aca: " << this->serial_number << '\n';
-    certificate.addSerialNumber(this->serial_number);
-    this->serial_number ++;
+    certificate.addSerialNumber(this->certificates.size());
     this->certificates.insert({subj, key});
-    //std::cerr << "agrego: " << this->certificates.size() << '\n';
 }
 
 
 void Index::erase(std::string str) {
-    this->serial_number --;
     this->certificates.erase(str);
 }
 void Index::write() {
@@ -90,7 +84,7 @@ void Index::write() {
     if (!file.is_open()) {
         //exc
     }
-    file << std::to_string(this->serial_number + 1) << '\n';
+    file << std::to_string(this->certificates.size() + 1) << '\n';
     std::map<std::string, Key>::iterator it = this->certificates.begin();
     for (; it != this->certificates.end(); ++it) {
         file << it->first << "; " << it->second << '\n';
