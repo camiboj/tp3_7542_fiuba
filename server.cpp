@@ -131,12 +131,13 @@ int main(int argc, char* argv[]) {
     std::string index_filename(argv[3]);
     Index index(index_filename);
     
+    Key key(argv[2]);
 
     int s;
     uint8_t command;
     skt.reciveSome(&command, COMMAND_SIZE);
 
-    Key key(argv[2]);
+    
     if (command == 0) {
         NewClientProcessor ncp(index, key);
         s = ncp.run(skt);
@@ -146,7 +147,10 @@ int main(int argc, char* argv[]) {
     }
     if (command == 1) {
         RevokeClientProcessor rcp(index, key);
-        rcp.run(skt);
+        s = rcp.run(skt);
+        if (!s) {
+            return 1;
+        }
     }
     index.write();    
     return 0;

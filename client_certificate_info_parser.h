@@ -1,5 +1,5 @@
-#ifndef CLIENT_CERTIFICATE_INFO_PARCER_H
-#define CLIENT_CERTIFICATE_INFO_PARCER_H
+#ifndef CLIENT_CERTIFICATE_INFO_PARSER_H
+#define CLIENT_CERTIFICATE_INFO_PARSER_H
 #include <string>
 
 /******************************************************************************
@@ -11,11 +11,11 @@
  * Si las fechas no existen from sera la fecha actual y to 30 dias despues.
 */
 
-class CertificateInfoParcer {
+class CertificateInfoParser {
     public:
-        CertificateInfoParcer(std::string& filename, std::string& subject,\
+        CertificateInfoParser(std::string& filename, std::string& subject,\
                              std::string& from, std::string& to);
-        ~CertificateInfoParcer();
+        ~CertificateInfoParser();
 };
 
 #endif

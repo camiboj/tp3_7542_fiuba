@@ -2,10 +2,10 @@
 #include <sstream>
 #include <iostream>
 #include <string>
-#include "client_certificate_info_parcer.h"
+#include "client_certificate_info_parser.h"
 #include "common_time.h"
 
-CertificateInfoParcer::CertificateInfoParcer(std::string& filename, \
+CertificateInfoParser::CertificateInfoParser(std::string& filename, \
                                 std::string& subject, std::string& from,\
                                 std::string& to) {
     std::ifstream file;
@@ -30,4 +30,4 @@ CertificateInfoParcer::CertificateInfoParcer(std::string& filename, \
     }
 }
 
-CertificateInfoParcer::~CertificateInfoParcer() {}
+CertificateInfoParser::~CertificateInfoParser() {}

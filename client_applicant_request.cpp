@@ -2,7 +2,7 @@
 #include <sstream>
 #include <iostream>
 #include <string>
-#include "client_certificate_info_parcer.h"
+#include "client_certificate_info_parser.h"
 #include "client_applicant_request.h"
 #include "common_time.h"
 #define COMMAND_SIZE 1
@@ -11,7 +11,7 @@
 ApplicantRequest::ApplicantRequest(std::string& cert_filename,\
                                  std::string& key_filename) {
         this->key.set(key_filename);
-        CertificateInfoParcer cir(cert_filename, this->subject, \
+        CertificateInfoParser cir(cert_filename, this->subject, \
                                   this->date_from, this->date_to);
 }
 ApplicantRequest::~ApplicantRequest() {}

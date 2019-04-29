@@ -54,7 +54,7 @@ int RevokeClientProcessor::run(Socket& skt) {
     Rsa rsa(index.findCertificate(certificate), server_key);
     uint32_t desencrytion = rsa.privateDesencryption(encryption);
     uint32_t client_hash = rsa.publicDesencryption(desencrytion);
-    std::cout << certificate.toString() << '\n';
+    //std::cout << certificate.toString() << '\n';
     Hash hash(certificate.toString());
     uint32_t my_hash = hash();
     if (my_hash != client_hash) {

@@ -1,36 +1,14 @@
-
 #include <iostream>
 #include <ostream>
 #include <fstream>
 #include <string>
-#include "common_certificate.h"
 #include "common_socket.h"
-#include "client_applicant_request.h"
-#include "common_hash.h"
-#include "common_rsa.h"
+#include "client_new_processor.h"
+#include "client_revoke_processor.h"
 #define ARGUMENT_ERROR_MSSG "Error: argumentos invalidos.\n"
-#define ARGUMENT_ERROR 0
-#define USER_ERROR_MSSG "Error: usuario no registrado.\n"
-#define USER_ERROR 0
-#define CERTIFICATE_ERROR_MSSG "Error: ya existe un certificado.\n"
-#define CERTIFICATE_ERROR 0
-#define CERIFICATE_ERROR_RECIVED_MSSG 0
-#define HASH_ERROR_MSSG "Error: los hashes no coinciden.\n"
-#define HASH_ERROR 0
-#define HASH_ERROR_SERVER_MSSG 1
-#define HASH_OK_SERVER_MSSG 0
 #define CF_SIZE 4 //certificate footprint size in bytes
 #define HASH_SIZE 4
-#define NOTIFICATION_SIZE 1
-#define HASH_ERROR_SM 2
-#define INVALID_CERTIFICATE 1
-#define INVALID_CERTIFICATE_MSSG "Error: usuario no registrado.\n"
-#define CERT_FP "Huella del servidor: "
-#define SH "Hash del servidor: "
-#define MH "Hash calculado: "
-#define HASH "Hash calculado: "
-#define PRIVATE_ENCRYPTION "Hash encriptado con la clave privada: "
-#define PUBLIC_ENCRYPTION "Huella enviada: "
+
 
 /********************************** COMANDOS *********************************/
 
@@ -142,14 +120,15 @@
 int main(int argc, char* argv[]) {
     if (argc != 7) {
         std::cout << ARGUMENT_ERROR_MSSG;
-        return ARGUMENT_ERROR;
+        return 0;
     }
+
     std::string mode1("new");
     std::string mode2("revoke");
     std::string mode = std::string(argv[3]);
     if (mode != mode1 && mode != mode2) {
         std::cout << ARGUMENT_ERROR_MSSG;
-        return ARGUMENT_ERROR;
+        return 0;
     }
 
     char* host = argv[1];
@@ -157,84 +136,21 @@ int main(int argc, char* argv[]) {
     Socket skt(host, port, 0);
     skt.connectWithServer();
 
-    
-
     if (mode == mode1) {
         std::string client_key_filename(argv[5]);
         std::string certificate_information_filename(argv[4]);
-
-        ApplicantRequest request(certificate_information_filename,\
-                                 client_key_filename);
-        request.send(skt);
-        uint8_t answer = 1;
-        skt.reciveNumber(&answer);
-        if (answer == CERIFICATE_ERROR_RECIVED_MSSG) {
-            std::cout << CERTIFICATE_ERROR_MSSG;
-            return CERTIFICATE_ERROR;
-        }
-
-        Certificate certificate;
-        certificate.recive(skt);
-        std::string formal_certificate;
-        formal_certificate = certificate.toString();
-
-
-        Hash hash(formal_certificate);
-        uint32_t my_hash =  hash();
-        
-
-        uint32_t server_hash = 0;
-        skt.reciveNumber(&server_hash);
-        
-        uint32_t certificate_footprint = 0;
-        skt.reciveNumber(&certificate_footprint);
-
-        uint8_t notification = HASH_OK_SERVER_MSSG;
-        if (my_hash != server_hash) {
-            notification = HASH_ERROR_SERVER_MSSG;
-            skt.sendNumber(notification);
-            std::cout << HASH_ERROR_MSSG;
-            return HASH_ERROR;
-        }
-        skt.sendNumber(notification);
-        std::cout << CERT_FP << certificate_footprint << '\n';
-        std::cout << SH << server_hash << '\n';
-        std::cout << MH << my_hash << '\n';
-
-        std::string filename = request.getSubject() + ".cert";
-        std::ofstream file;
-        file.open(filename, std::ofstream::out | std::ofstream::trunc);
-    
-        if (!file.is_open()) {
-            //exc
-        }
-        file << formal_certificate;
+        NewProcessor np(skt);
+        np.run(client_key_filename, certificate_information_filename);
         return 0;
     }
-    if (mode == mode2) {
-        uint8_t command = 1;
-        skt.sendNumber(command);
-        Certificate certificate;
-        uint32_t hash = certificate.send(std::string(argv[4]), skt);
-        Key server_key(argv[6]);
-        Key client_key(argv[5]);
-        Rsa rsa(server_key, client_key);
-        uint32_t priv_encryption = rsa.privateEncryption(hash);
-        uint32_t publ_encryption = rsa.publicEncryption(priv_encryption);
-        skt.sendNumber(publ_encryption);
-        uint8_t status = 0;
-        skt.reciveNumber(&status);
-        if (status == HASH_ERROR_SM) {
-            std::cout << HASH_ERROR_MSSG;
-            return 0;
-        }
-        if (status == INVALID_CERTIFICATE) {
-            std::cout << INVALID_CERTIFICATE_MSSG;
-            return 0;
-        }
-        std::cout << HASH << (int) hash << '\n';
-        std::cout << PRIVATE_ENCRYPTION << (int) priv_encryption << '\n';
-        std::cout << PUBLIC_ENCRYPTION << (int) publ_encryption << '\n';
+
+    if (mode == mode2) { //std::string(argv[4])
+        std::string certificate_filename = std::string(argv[4]);
+        std::string client_key_filname = std::string(argv[5]);
+        std::string server_key_filename = std::string(argv[6]);
+        RevokeProcessor rp(skt);
+        rp.run(certificate_filename, client_key_filname, server_key_filename);
+        return 0;
     }
     return 0;
 }
