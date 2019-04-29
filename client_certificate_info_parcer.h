@@ -1,5 +1,5 @@
-#ifndef COMMON_CERTIFICATE_INFO_PARCER_H
-#define COMMON_CERTIFICATE_INFO_PARCER_H
+#ifndef CLIENT_CERTIFICATE_INFO_PARCER_H
+#define CLIENT_CERTIFICATE_INFO_PARCER_H
 #include <string>
 
 /******************************************************************************

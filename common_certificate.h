@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string>
 #include <queue>
+#include <istream>
 #include "common_key.h"
 #include "common_socket.h"
 
@@ -24,6 +25,12 @@ class Certificate {
         * Se envian los datos del certificado por el socket.
         */
         void send(Socket& skt);
+        /*
+        * Se lee el archivo contenedor del certificado,
+        * se envian los datos a traves del socket
+        * y se devuelve el valor del certificado hasheado
+        */
+        uint32_t send(std::string filename, Socket& skt);
         /*
         * Se reciben los datos del certificado por el socket.
         */
@@ -47,6 +54,10 @@ class Certificate {
          *        exponent: 19 (hexa n 1 byte)
         */  
         std::string toString();
+        std::string getSubject();
+        Key getKey();
+        friend std::ostream& operator<<(std::ostream &o, Certificate& self);
+        //friend std::istream& operator>> (std::istream &in, Certificate& self);
 };
 
 #endif

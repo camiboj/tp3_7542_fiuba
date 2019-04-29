@@ -36,3 +36,12 @@ uint32_t Rsa::publicEncryption(const uint32_t hash) {
 uint32_t Rsa::privateEncryption(const uint32_t hash) {
     return encrypt(this->private_exponent, this->private_module, hash);
 }
+
+uint32_t Rsa::publicDesencryption(const uint32_t hash){
+    return encrypt(this->public_exponent, this->public_module, hash);
+}
+
+uint32_t Rsa::privateDesencryption(const uint32_t hash) {
+    return encrypt(this->private_exponent, this->private_module, hash);
+}
+

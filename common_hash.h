@@ -14,7 +14,6 @@ class Hash {
         Hash();
         explicit Hash(std::string str);
         ~Hash();
-        
         /*
         * Recibe una cadena y actualiza el resultado de la función de hash.
         */

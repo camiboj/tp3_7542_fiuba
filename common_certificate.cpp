@@ -1,8 +1,11 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <fstream>
+#include <ios>
 #include "common_string.h"
 #include "common_certificate.h"
+#include "common_hash.h"
 #define CERTIFICATE "certificate:\n"
 #define SERIAL_NUMBER "\tserial number: "
 #define SN_SIZE 4
@@ -49,7 +52,7 @@ Certificate::Certificate(std::string _subject, std::string _not_before, \
  * module:          2 bytes
 */
 void Certificate::send(Socket& skt) {
-    skt.sendNumber(serial_number);
+    skt.sendNumber(this->serial_number);
     skt.sendAll(this->subject);
     skt.sendAll(this->not_before);
     skt.sendAll(this->not_after);
@@ -58,7 +61,7 @@ void Certificate::send(Socket& skt) {
 
 
 void Certificate::recive(Socket& skt) {
-    skt.reciveNumber(&serial_number);
+    skt.reciveNumber(&this->serial_number);
     skt.reciveAll(this->subject);
     skt.reciveAll(this->not_before);
     skt.reciveAll(this->not_after);
@@ -80,11 +83,18 @@ std::string toHexaString(int n, int len) {
     return hexa + number + ')';
 }
 
+std::string Certificate::getSubject() {
+    return this->subject;
+}
+
+Key Certificate::getKey() {
+    return this->key;
+}
 
 std::string Certificate::toString() {
     std::string o;
     o += std::string(CERTIFICATE);
-    int n = (int) this->serial_number + 1;
+    int n = (int) this->serial_number;
     std::string sn = toHexaString(n, SN_SIZE);
     o += SERIAL_NUMBER + std::to_string(n) + ' ' + sn + '\n';
 
@@ -104,6 +114,69 @@ std::string Certificate::toString() {
     k.printPublicExponent(o, toHexaString);
 
     return o;
+}
+
+/******************************************************************************
+ *0 certificate:
+ *1    serial number: 1 (0x00000001)
+ *2    subject: Federico Manuel Gomez Peter
+ *3    issuer: Taller de programacion 1
+ *4    validity:
+ *5        not before: Mar 28 21:33:04 2019
+ *6        not after: May 27 21:33:04 2019
+ *7    subject public key info:
+ *8        modulus: 253 (0x00fd)
+ *9        exponent: 19 (0x13)
+*/
+uint32_t Certificate::send(std::string filename, Socket& skt) {
+    std::ifstream file;
+    file.open(filename);
+    std::string line;
+    int count = 0;
+    int pos;
+    int len;
+    std::string module;
+    std::string exp;
+    Hash hash;
+    while (std::getline(file, line, '\n')) {
+        if (!file.eof()) {
+            hash.load(line + '\n');
+        } else {
+            hash.load(line);
+        }
+        //std::cout << "Line: " << line << '\n';
+        pos = line.find(':');
+        line = line.c_str();
+        len = line.length();
+        if (pos + 2 > len) { //certificate:\0
+            ++count;
+            continue;
+        }
+        line = line.substr(pos + 2,len);
+        if (count == 1) {
+            len = line.find(' ');
+            skt.sendNumber((uint32_t)std::stoi(line.substr(0, len)));
+        } else if ((count == 2) | (count == 5) | (count == 6)) {
+            skt.sendAll(line);
+        } else if (count == 8) {
+            len = line.find(' ');
+            module = line.substr(0, len);
+        } else if (count == 9) {
+            len = line.find(' ');
+            exp = line.substr(0, len);
+        }        
+        ++count;
+    }
+    Key key(exp, module);
+    key.send(skt);
+    return hash();
+}
+
+std::ostream& operator<<(std::ostream &o, Certificate& self) {
+    std::string formal_certificate;
+    formal_certificate = self.toString();
+    o << formal_certificate;
+    return o;   
 }
 
 Certificate::~Certificate() {}

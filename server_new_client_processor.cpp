@@ -65,7 +65,7 @@ void NewClientProcessor::reciveInfo(Socket& skt) {
 std::string NewClientProcessor::createCertificate(Socket& skt) {
     Certificate certificate(this->subject, this->date_from, this->date_to,\
              this->client_key);
-    this->index.saveCertificate(this->subject, this->client_key, certificate);
+    this->index.saveCertificate(certificate);
     std::string result = certificate.toString();
     certificate.send(skt);
     return result;
@@ -107,7 +107,7 @@ int NewClientProcessor::run(Socket& skt) {
     uint8_t hash_status = 0;
     skt.reciveNumber(&hash_status);
     if (hash_status == HASH_ERROR) {
-        index.erase(this->subject);
+        index.eraseCertificate(this->subject);
     }
     return ERROR_CODE;
 }

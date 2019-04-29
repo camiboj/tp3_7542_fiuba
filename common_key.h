@@ -16,6 +16,7 @@ class Key {
         Key();
         Key(const Key &self);
         Key(std::string _public_exponent, std::string _module);
+        explicit Key(std::string filename);
         ~Key();
         /*
          * Recibe el nombre de un archivo de tipo
@@ -25,6 +26,7 @@ class Key {
          * únicamente se garantiza que estos se encuentran en una misma línea.
         */
         void set(std::string filename);
+        void set(std::string _public_exponent, std::string _module);
         /*
          * Envia, a traves del socket pasado por parametro:
          * Módulo: en formato 2 bytes en big endian sin signo.

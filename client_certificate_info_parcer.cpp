@@ -2,7 +2,7 @@
 #include <sstream>
 #include <iostream>
 #include <string>
-#include "common_certificate_info_parcer.h"
+#include "client_certificate_info_parcer.h"
 #include "common_time.h"
 
 CertificateInfoParcer::CertificateInfoParcer(std::string& filename, \

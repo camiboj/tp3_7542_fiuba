@@ -2,6 +2,7 @@
 #include <iostream>
 #include "server_new_client_processor.h"
 #include "server_index.h"
+#include "server_revoke_client_processor.h"
 
 #define ERROR_CODE 1
 #define COMMAND_SIZE 1
@@ -129,20 +130,23 @@ int main(int argc, char* argv[]) {
     
     std::string index_filename(argv[3]);
     Index index(index_filename);
-    //std::cout << "sali \n";
+    
 
     int s;
     uint8_t command;
     skt.reciveSome(&command, COMMAND_SIZE);
 
-    Key key;
-    key.set(argv[2]);
+    Key key(argv[2]);
     if (command == 0) {
-        NewClientProcessor ap(index, key);
-        s = ap.run(skt);
+        NewClientProcessor ncp(index, key);
+        s = ncp.run(skt);
         if (!s) {
             return 1;
         }
+    }
+    if (command == 1) {
+        RevokeClientProcessor rcp(index, key);
+        rcp.run(skt);
     }
     index.write();    
     return 0;

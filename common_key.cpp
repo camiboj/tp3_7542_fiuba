@@ -18,6 +18,15 @@ Key::Key(std::string _public_exponent, std::string _module) {
 
 Key::Key() {}
 
+void Key::set(std::string _public_exponent, std::string _module){
+    this->public_exponent = (uint8_t) atoi(_public_exponent.c_str());
+    this->module = (uint8_t) atoi(_module.c_str());
+}
+
+Key::Key(std::string filename) {
+    this->set(filename);
+}
+
 void Key::set(std::string filename) {
     std::ifstream file;
     file.open(filename); 
@@ -33,6 +42,9 @@ void Key::set(std::string filename) {
             this->module = (uint16_t) atoi(line.c_str());
         }
         i++;
+    }
+    if (i == MODULE_POS) {
+        this->module = this->private_exponent;
     }
     //file.close();
 }

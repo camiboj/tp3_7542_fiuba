@@ -22,6 +22,8 @@ class Rsa {
         */
         uint32_t publicEncryption(const uint32_t hash);
         uint32_t privateEncryption(const uint32_t hash);
+        uint32_t publicDesencryption(const uint32_t hash);
+        uint32_t privateDesencryption(const uint32_t hash);
 };
 
 #endif

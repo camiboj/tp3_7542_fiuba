@@ -14,12 +14,13 @@ class Index {
     public:
         //Index();
         void write();
-        void saveCertificate(std::string str, 
-                            Key& key,
-                            Certificate& certificate);
+        void saveCertificate(Certificate& certificate);
         
         bool hasCertificate(std::string str);
-        void erase(std::string str);
+        bool hasCertificate(Certificate certificate);
+        Key findCertificate(Certificate cartificate);
+        void eraseCertificate(Certificate certificate);
+        void eraseCertificate(std::string str);
 
         explicit Index(std::string& filename);
         ~Index();

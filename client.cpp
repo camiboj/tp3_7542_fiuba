@@ -7,6 +7,7 @@
 #include "common_socket.h"
 #include "client_applicant_request.h"
 #include "common_hash.h"
+#include "common_rsa.h"
 #define ARGUMENT_ERROR_MSSG "Error: argumentos invalidos.\n"
 #define ARGUMENT_ERROR 0
 #define USER_ERROR_MSSG "Error: usuario no registrado.\n"
@@ -21,9 +22,15 @@
 #define CF_SIZE 4 //certificate footprint size in bytes
 #define HASH_SIZE 4
 #define NOTIFICATION_SIZE 1
+#define HASH_ERROR_SM 2
+#define INVALID_CERTIFICATE 1
+#define INVALID_CERTIFICATE_MSSG "Error: usuario no registrado.\n"
 #define CERT_FP "Huella del servidor: "
 #define SH "Hash del servidor: "
 #define MH "Hash calculado: "
+#define HASH "Hash calculado: "
+#define PRIVATE_ENCRYPTION "Hash encriptado con la clave privada: "
+#define PUBLIC_ENCRYPTION "Huella enviada: "
 
 /********************************** COMANDOS *********************************/
 
@@ -137,7 +144,6 @@ int main(int argc, char* argv[]) {
         std::cout << ARGUMENT_ERROR_MSSG;
         return ARGUMENT_ERROR;
     }
-
     std::string mode1("new");
     std::string mode2("revoke");
     std::string mode = std::string(argv[3]);
@@ -150,6 +156,8 @@ int main(int argc, char* argv[]) {
     char* port = argv[2];
     Socket skt(host, port, 0);
     skt.connectWithServer();
+
+    
 
     if (mode == mode1) {
         std::string client_key_filename(argv[5]);
@@ -201,10 +209,32 @@ int main(int argc, char* argv[]) {
             //exc
         }
         file << formal_certificate;
+        return 0;
     }
-
-    if (mode == mode1) {   
+    if (mode == mode2) {
+        uint8_t command = 1;
+        skt.sendNumber(command);
+        Certificate certificate;
+        uint32_t hash = certificate.send(std::string(argv[4]), skt);
+        Key server_key(argv[6]);
+        Key client_key(argv[5]);
+        Rsa rsa(server_key, client_key);
+        uint32_t priv_encryption = rsa.privateEncryption(hash);
+        uint32_t publ_encryption = rsa.publicEncryption(priv_encryption);
+        skt.sendNumber(publ_encryption);
+        uint8_t status = 0;
+        skt.reciveNumber(&status);
+        if (status == HASH_ERROR_SM) {
+            std::cout << HASH_ERROR_MSSG;
+            return 0;
+        }
+        if (status == INVALID_CERTIFICATE) {
+            std::cout << INVALID_CERTIFICATE_MSSG;
+            return 0;
+        }
+        std::cout << HASH << (int) hash << '\n';
+        std::cout << PRIVATE_ENCRYPTION << (int) priv_encryption << '\n';
+        std::cout << PUBLIC_ENCRYPTION << (int) publ_encryption << '\n';
     }
-
     return 0;
 }
