@@ -14,6 +14,7 @@ class RevokeClientProcessor : public Thread {
         Index& index;
         Key server_key;
         bool is_dead;
+        
     public:
         RevokeClientProcessor(MySocket& _skt, Index& _index, Key _key);
         

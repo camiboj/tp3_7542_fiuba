@@ -17,7 +17,7 @@ class NewClientProcessor: public Thread {
         std::string date_from;
         std::string date_to;
         bool is_dead;
-        void reciveInfo();
+        void receiveInfo();
         std::string createCertificate();
         bool checkCertificate();
 

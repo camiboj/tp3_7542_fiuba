@@ -1,4 +1,5 @@
 #include "common_my_socket.h"
+#include <string>
 #include <iostream>
 #define UINT8_SIZE 1
 #define UINT16_SIZE 2
@@ -34,36 +35,36 @@ int MySocket::sendAll(std::string str) {
 }
 
 
-int MySocket::reciveAll(std::string& str) {
+int MySocket::receiveAll(std::string& str) {
     uint32_t len = (uint32_t) str.length();
-    this->reciveNumber(&len);
+    this->receiveNumber(&len);
     char c;
-    int recived = 0;
+    int received = 0;
     for (size_t i = 0; i < len; ++i){
-        recived = this->skt.reciveSome(&c, 1);
+        received = this->skt.receiveSome(&c, 1);
         str.append(1, c);
     }
-    return recived;
+    return received;
 }
 
-void MySocket::reciveNumber(uint8_t* n) {
-    this->skt.reciveAll(n, UINT8_SIZE);
+void MySocket::receiveNumber(uint8_t* n) {
+    this->skt.receiveAll(n, UINT8_SIZE);
 }
 
 
-void MySocket::reciveNumber(uint16_t* n) {
+void MySocket::receiveNumber(uint16_t* n) {
     uint16_t aux;
-    this->skt.reciveAll(&aux, UINT16_SIZE);
+    this->skt.receiveAll(&aux, UINT16_SIZE);
     *n = htobe16(aux);
 }
 
 
-void MySocket::reciveNumber(uint32_t* n) {
+void MySocket::receiveNumber(uint32_t* n) {
     uint32_t aux;
-    this->skt.reciveAll(&aux, UINT32_SIZE);
+    this->skt.receiveAll(&aux, UINT32_SIZE);
     *n = htobe32(aux);
 }
 
 void MySocket::stop() {
-    this->skt.disableClient();
+    //this->skt.disableClient();
 }

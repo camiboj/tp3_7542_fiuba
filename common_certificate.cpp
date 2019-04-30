@@ -59,12 +59,12 @@ void Certificate::send(MySocket& skt) {
 }
 
 
-void Certificate::recive(MySocket& skt) {
-    skt.reciveNumber(&this->serial_number);
-    skt.reciveAll(this->subject);
-    skt.reciveAll(this->not_before);
-    skt.reciveAll(this->not_after);
-    this->key.recive(skt);
+void Certificate::receive(MySocket& skt) {
+    skt.receiveNumber(&this->serial_number);
+    skt.receiveAll(this->subject);
+    skt.receiveAll(this->not_before);
+    skt.receiveAll(this->not_after);
+    this->key.receive(skt);
 }
 
 std::string toHexaString(int n, int len) {

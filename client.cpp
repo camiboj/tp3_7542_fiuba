@@ -133,8 +133,8 @@ int main(int argc, char* argv[]) {
 
     char* host = argv[1];
     char* port = argv[2];
-    Socket skt(host, port, 0);
-    skt.connectWithServer();
+    Socket skt;
+    skt.connectWithServer(host, port);
     MySocket my_socket(skt);
 
     if (mode == mode1) {

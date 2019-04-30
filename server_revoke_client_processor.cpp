@@ -33,7 +33,8 @@
  * 3- Responde al cliente con un código 0
 */
 
-RevokeClientProcessor::RevokeClientProcessor(MySocket& _skt, Index& _index, Key _key):
+RevokeClientProcessor::RevokeClientProcessor(MySocket& _skt,\
+                                             Index& _index, Key _key):
     skt(_skt),
     index(_index), 
     server_key(_key),
@@ -43,9 +44,9 @@ RevokeClientProcessor::~RevokeClientProcessor() {}
 
 void RevokeClientProcessor::run() {
     Certificate certificate;
-    certificate.recive(skt);
+    certificate.receive(skt);
     uint32_t encryption = 0;
-    this->skt.reciveNumber(&encryption);
+    this->skt.receiveNumber(&encryption);
     uint8_t answer;
     if (!this->index.hasCertificate(certificate)) { //ACA!
         answer = INVALID_CERTIFICATE_MSSG;

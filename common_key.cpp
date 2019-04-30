@@ -57,9 +57,9 @@ Key::Key(const Key &key) {
 
 Key::~Key() {}
 
-void Key::recive(MySocket& skt) {
-    skt.reciveNumber(&this->public_exponent);
-    skt.reciveNumber(&this->module);
+void Key::receive(MySocket& skt) {
+    skt.receiveNumber(&this->public_exponent);
+    skt.receiveNumber(&this->module);
 }
 
 void Key::send(MySocket& skt) {

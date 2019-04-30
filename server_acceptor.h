@@ -18,6 +18,7 @@ class Acceptor : public Thread {
         Socket& skt;
         Index& index;
         Key key;
+        Socket client_skt;
         bool keep_talking;
 
     public:

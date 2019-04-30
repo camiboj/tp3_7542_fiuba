@@ -27,7 +27,7 @@ void RevokeProcessor::run(std::string certificate_filename,\
     uint32_t publ_encryption = rsa.publicEncryption(priv_encryption);
     this->skt.sendNumber(&publ_encryption);
     uint8_t status = 0;
-    this->skt.reciveNumber(&status);
+    this->skt.receiveNumber(&status);
     if (status == HASH_ERROR_SM) {
         std::cout << HASH_ERROR_MSSG;
         return;

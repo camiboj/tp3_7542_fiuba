@@ -30,14 +30,14 @@ void NewProcessor::run(std::string client_key_filename, \
                                 client_key_filename);
     request.send(skt);
     uint8_t answer = 1;
-    skt.reciveNumber(&answer);
+    skt.receiveNumber(&answer);
     if (answer == CERIFICATE_ERROR_RECIVED_MSSG) {
         std::cout << CERTIFICATE_ERROR_MSSG;
         return;
     }
 
     Certificate certificate;
-    certificate.recive(skt);
+    certificate.receive(skt);
     std::string formal_certificate;
     formal_certificate = certificate.toString();
 
@@ -47,10 +47,10 @@ void NewProcessor::run(std::string client_key_filename, \
 
 
     uint32_t server_hash = 0;
-    skt.reciveNumber(&server_hash);
+    skt.receiveNumber(&server_hash);
 
     uint32_t certificate_footprint = 0;
-    skt.reciveNumber(&certificate_footprint);
+    skt.receiveNumber(&certificate_footprint);
 
     uint8_t notification = HASH_OK_SERVER_MSSG;
     if (my_hash != server_hash) {

@@ -34,7 +34,7 @@ class Certificate {
         /*
         * Se reciben los datos del certificado por el socket.
         */
-        void recive(MySocket& skt);
+        void receive(MySocket& skt);
         /*
          * Seter del serial number
         */

@@ -7,7 +7,7 @@ class NewProcessor {
     private:
         MySocket& skt;
     public:
-        NewProcessor(MySocket& skt);
+        explicit NewProcessor(MySocket& skt);
         ~NewProcessor();
         void run(std::string client_key_filename, \
                     std::string certificate_information_filename);

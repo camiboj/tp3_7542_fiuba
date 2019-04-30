@@ -33,7 +33,7 @@ class Key {
          * Exponente: en 1 byte.
         */
         void send(MySocket& skt);
-        void recive(MySocket& skt);
+        void receive(MySocket& skt);
         friend std::ostream& operator<<(std::ostream&, const Key&);
         /*
          * Recibe un string y una función que al pasarle el exponente publico y

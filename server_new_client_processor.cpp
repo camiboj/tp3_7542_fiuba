@@ -40,7 +40,8 @@
  * 
 */
 
-NewClientProcessor::NewClientProcessor(MySocket& _skt, Index& _index, Key _key) : 
+NewClientProcessor::NewClientProcessor(MySocket& _skt, \
+                                        Index& _index, Key _key) : 
     skt(_skt),
     index(_index), 
     server_key(_key),
@@ -48,13 +49,13 @@ NewClientProcessor::NewClientProcessor(MySocket& _skt, Index& _index, Key _key) 
 
 NewClientProcessor::~NewClientProcessor() {}
 
-void NewClientProcessor::reciveInfo() {
-    skt.reciveAll(this->subject);
-    this->client_key.recive(skt);
+void NewClientProcessor::receiveInfo() {
+    skt.receiveAll(this->subject);
+    this->client_key.receive(skt);
     
-    skt.reciveAll(this->date_from);
+    skt.receiveAll(this->date_from);
 
-    skt.reciveAll(this->date_to);
+    skt.receiveAll(this->date_to);
     if (subject.size() == 0) {
         throw std::runtime_error("");
     }
@@ -90,18 +91,17 @@ uint32_t encrypt(Key client_key, Key server_key, uint32_t hash) {
 
 void NewClientProcessor::run() {
     //std::string str;
-    //    this->skt.reciveAll(str);
+    //    this->skt.receiveAll(str);
     //    std::cout << "STR: " << str << '\n';
     try {
-        this->reciveInfo();
+        this->receiveInfo();
     }
     catch (...) {
         this->is_dead = true;
         return;
     }
     bool s = this->checkCertificate();
-    
-    if (!s) return ;
+    if (!s) return;
     std::string formal_certificate = this->createCertificate();
     
     Hash hash(formal_certificate);
@@ -113,7 +113,7 @@ void NewClientProcessor::run() {
     skt.sendNumber(&encryption);
     
     uint8_t hash_status = 0;
-    skt.reciveNumber(&hash_status);
+    skt.receiveNumber(&hash_status);
     if (hash_status == HASH_ERROR) {
         index.eraseCertificate(this->subject);
     }

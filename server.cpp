@@ -124,8 +124,8 @@ int main(int argc, char* argv[]) {
 	    return 1;
     }
 
-    Socket skt(argv[1]);
-    skt.connectWithClients();
+    Socket skt;
+    skt.connectWithClients(argv[1]);
 
 
     std::string index_filename(argv[3]);
