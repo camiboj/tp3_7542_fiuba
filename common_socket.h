@@ -20,6 +20,7 @@ class Socket {
         Socket(const char* _host, const char* _port, int flag);
         
         explicit Socket(const char* _port);
+         Socket(int _currentpeerskt);
         Socket(int skt, int _currentpeerskt);
         ~Socket();
 
@@ -28,7 +29,7 @@ class Socket {
         */
         bool connectWithClients();
 
-        Socket* acceptClient();
+        Socket acceptClient();
 
         //void reciveNumber(uint8_t* n);
         //void reciveNumber(uint16_t* n);

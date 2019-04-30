@@ -3,3 +3,5 @@ Federico Manuel Gomez Peter.cert
 *.o
 
 pruebas*
+common_socketcpp.txt
+common_socketh.txt

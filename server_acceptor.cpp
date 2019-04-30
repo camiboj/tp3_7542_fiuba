@@ -8,21 +8,20 @@ Acceptor::Acceptor(Socket& _skt, Index& _index, Key _key):
     skt(_skt), 
     index(_index), 
     key(_key),
-    keep_talking(true){}
+    keep_talking(true) {}
         
 void Acceptor::run() {
     std::vector<Thread*> clients;
     
     do {
-        Socket* client_skt = this->skt.acceptClient();
-        MySocket my_socket(*client_skt);
+        Socket client_skt = this->skt.acceptClient();
+        MySocket my_socket(client_skt);
 
         uint8_t command;
         my_socket.reciveNumber(&command);
         
         Thread* client;
         if (command == 0) {
-            //std::cout << (int) command << '\n';
             client = new NewClientProcessor(my_socket, index, key);
         }
         if (command == 1) {
@@ -34,7 +33,7 @@ void Acceptor::run() {
         for ( ; it != clients.end(); ++it) {
 	        Thread* client = *it;
             if (client->isDead()) {	
-                client->stop();			
+                client->stop();		
                 client->join(); 
 	        	delete client;
 	        	clients.erase(it);

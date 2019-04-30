@@ -56,6 +56,8 @@ Socket::Socket(int _skt, int _current_peerskt) :
 skt(_skt), 
 current_peerskt(_current_peerskt) {}
 
+Socket::Socket(int _current_peerskt) : current_peerskt(_current_peerskt) {}
+
 /*Socket::Socket(int _skt, int _current_peerskt, struct addrinfo *_result) {
     this->skt = _skt;
     this->current_peerskt = _current_peerskt;
@@ -150,10 +152,10 @@ void Socket::disableClient() {
     close(this->current_peerskt);
 }
 
-Socket* Socket::acceptClient(){
+Socket Socket::acceptClient(){
     int peerskt = accept(this->skt, NULL, NULL);
-    Socket* skt = new Socket(this->skt, peerskt);
-    return skt;
+    Socket skt(peerskt);
+    return std::move(skt);
 }
 
 
