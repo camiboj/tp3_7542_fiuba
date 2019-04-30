@@ -40,22 +40,24 @@
  * 
 */
 
-NewClientProcessor::NewClientProcessor(MySocket& _skt, \
+NewClientProcessor::NewClientProcessor(MySocket* _skt, \
                                         Index& _index, Key _key) : 
     skt(_skt),
     index(_index), 
     server_key(_key),
     is_dead(false) {}
 
-NewClientProcessor::~NewClientProcessor() {}
+NewClientProcessor::~NewClientProcessor() {
+    delete this->skt;
+}
 
 void NewClientProcessor::receiveInfo() {
-    skt.receiveAll(this->subject);
-    this->client_key.receive(skt);
+    skt->receiveAll(this->subject);
+    this->client_key.receive(*skt);
     
-    skt.receiveAll(this->date_from);
+    skt->receiveAll(this->date_from);
 
-    skt.receiveAll(this->date_to);
+    skt->receiveAll(this->date_to);
     if (subject.size() == 0) {
         throw std::runtime_error("");
     }
@@ -66,7 +68,7 @@ std::string NewClientProcessor::createCertificate() {
              this->client_key);
     this->index.saveCertificate(certificate);
     std::string result = certificate.toString();
-    certificate.send(skt);
+    certificate.send(*skt);
     return result;
 }
 
@@ -74,11 +76,11 @@ bool NewClientProcessor::checkCertificate() {
     uint8_t answer = CERTIFICATE_OK;
     if (index.hasCertificate(this->subject)) { 
         answer = CERTIFICATE_ERROR;
-        skt.sendNumber(&answer);
+        skt->sendNumber(&answer);
         //trow algo;
         return false;
     } 
-    skt.sendNumber(&answer);
+    skt->sendNumber(&answer);
     return true;
 }
 
@@ -91,7 +93,7 @@ uint32_t encrypt(Key client_key, Key server_key, uint32_t hash) {
 
 void NewClientProcessor::run() {
     //std::string str;
-    //    this->skt.receiveAll(str);
+    //    this->skt->receiveAll(str);
     //    std::cout << "STR: " << str << '\n';
     try {
         this->receiveInfo();
@@ -109,11 +111,11 @@ void NewClientProcessor::run() {
     uint32_t encryption = encrypt(this->client_key, this->server_key,\
                                  hashed_certificate);
 
-    skt.sendNumber(&hashed_certificate);
-    skt.sendNumber(&encryption);
+    skt->sendNumber(&hashed_certificate);
+    skt->sendNumber(&encryption);
     
     uint8_t hash_status = 0;
-    skt.receiveNumber(&hash_status);
+    skt->receiveNumber(&hash_status);
     if (hash_status == HASH_ERROR) {
         index.eraseCertificate(this->subject);
     }
@@ -127,5 +129,5 @@ bool NewClientProcessor::isDead() {
 }
 
 void NewClientProcessor::stop() {
-    this->skt.stop();
+    this->skt->stop();
 }

@@ -11,15 +11,20 @@ Acceptor::Acceptor(Socket& _skt, Index& _index, Key _key):
     key(_key),
     keep_talking(true) {}
         
-void Acceptor::run() {
-    std::vector<Thread*> clients;
-    
+void Acceptor::run() {    
     while (this->keep_talking) {
-        this->client_skt = this->skt.acceptClient();
-        MySocket my_socket(this->client_skt);
+        try {
+            this->client_skt = this->skt.acceptClient();
+        }
+        catch (...) {
+            break;
+        }
+
+        // std::cout << "Acepte un cliente!" << std::endl;
+        MySocket* my_socket = new MySocket(this->client_skt);
 
         uint8_t command;
-        my_socket.receiveNumber(&command);
+        my_socket->receiveNumber(&command);
         
         Thread* client;
         if (command == 0) {
@@ -28,18 +33,22 @@ void Acceptor::run() {
         if (command == 1) {
             client = new RevokeClientProcessor(my_socket, index, key);
         }
-        clients.push_back(client);
+        this->clients.push_back(client);
         client->start();
-        std::vector<Thread*>::iterator it = clients.begin();
-        for (; it != clients.end(); ++it) {
+        std::vector<Thread*>::iterator it = this->clients.begin();
+        // std::cout << "Largo clients: " << this->clients.size() << std::endl;
+        for (; it != this->clients.end(); ++it) {
 	        Thread* client = *it;
             if (client->isDead()) {	
+                // std::cout << "Eliminando threads muertos!" << std::endl;
                 //client->stop();		
                 client->join(); 
 	        	delete client;
-	        	clients.erase(it);
+	        	this->clients.erase(it);
 	        }
 	    }
+        // std::cout << "Largo clients: " << this->clients.size() << std::endl;
+
     }
 }
 
@@ -50,4 +59,16 @@ void Acceptor::stop() {
 
 bool Acceptor::isDead() {
     return !keep_talking;
+}
+
+Acceptor::~Acceptor() {
+    // std::cout << "Destruyendo Acceptor!" << std::endl;
+    // std::cout << "Largo clients al destruir: " << this->clients.size() << std::endl;
+    std::vector<Thread*>::iterator it = this->clients.begin();
+    for (; it != this->clients.end(); ++it) {
+        // std::cout << "Quedaron threads!" << std::endl;
+	    Thread* client = *it;
+            client->join(); 
+	    	delete client;
+    }
 }

@@ -9,7 +9,7 @@
 
 class NewClientProcessor: public Thread {
     private:
-        MySocket& skt;
+        MySocket* skt;
         Index& index;
         Key server_key;
         std::string subject;
@@ -26,7 +26,7 @@ class NewClientProcessor: public Thread {
         /*
         * Recibe los dos archivos necesarios para solicitar un nuevo aplicante
         */
-        NewClientProcessor(MySocket& skt, Index& _index, Key key);
+        NewClientProcessor(MySocket* skt, Index& _index, Key key);
         
         ~NewClientProcessor();
         /*  

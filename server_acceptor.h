@@ -20,9 +20,11 @@ class Acceptor : public Thread {
         Key key;
         Socket client_skt;
         bool keep_talking;
+        std::vector<Thread*> clients;
 
     public:
         Acceptor(Socket& _skt, Index& index, Key key);
+        ~Acceptor();
         virtual void run() override;
         virtual void stop() override;
         virtual bool isDead() override;

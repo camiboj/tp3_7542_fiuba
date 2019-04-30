@@ -143,7 +143,7 @@ uint32_t Certificate::send(std::string filename, MySocket& skt) {
         } else {
             hash.load(line);
         }
-        //std::cout << "Line: " << line << '\n';
+        //// std::cout << "Line: " << line << '\n';
         pos = line.find(':');
         line = line.c_str();
         len = line.length();

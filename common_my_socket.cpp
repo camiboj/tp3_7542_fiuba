@@ -7,7 +7,10 @@
 
 MySocket::MySocket(Socket& _skt): skt(_skt) {}
 
-MySocket::~MySocket() {}
+MySocket::~MySocket() {
+    // std::cout << "Destruyendo MySocket!" << std::endl;
+    
+}
 
 void MySocket::sendNumber(uint8_t* n) {
     this->skt.sendAll(n, UINT8_SIZE);

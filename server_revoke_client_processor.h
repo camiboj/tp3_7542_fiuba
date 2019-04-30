@@ -10,13 +10,13 @@
 
 class RevokeClientProcessor : public Thread {
     private:
-        MySocket& skt;
+        MySocket* skt;
         Index& index;
         Key server_key;
         bool is_dead;
         
     public:
-        RevokeClientProcessor(MySocket& _skt, Index& _index, Key _key);
+        RevokeClientProcessor(MySocket* _skt, Index& _index, Key _key);
         
         ~RevokeClientProcessor();
         /*  

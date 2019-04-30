@@ -33,24 +33,26 @@
  * 3- Responde al cliente con un código 0
 */
 
-RevokeClientProcessor::RevokeClientProcessor(MySocket& _skt,\
+RevokeClientProcessor::RevokeClientProcessor(MySocket* _skt,\
                                              Index& _index, Key _key):
     skt(_skt),
     index(_index), 
     server_key(_key),
     is_dead(false) {}
 
-RevokeClientProcessor::~RevokeClientProcessor() {}
+RevokeClientProcessor::~RevokeClientProcessor() {
+    delete this->skt;
+}
 
 void RevokeClientProcessor::run() {
     Certificate certificate;
-    certificate.receive(skt);
+    certificate.receive(*skt);
     uint32_t encryption = 0;
-    this->skt.receiveNumber(&encryption);
+    this->skt->receiveNumber(&encryption);
     uint8_t answer;
     if (!this->index.hasCertificate(certificate)) { //ACA!
         answer = INVALID_CERTIFICATE_MSSG;
-        this->skt.sendNumber(&answer);
+        this->skt->sendNumber(&answer);
         return;
     }
     Rsa rsa(index.findCertificate(certificate), server_key);
@@ -60,12 +62,12 @@ void RevokeClientProcessor::run() {
     uint32_t my_hash = hash();
     if (my_hash != client_hash) {
         answer = HASH_ERROR_MSSG;
-        this->skt.sendNumber(&answer);
+        this->skt->sendNumber(&answer);
         return;
     }
     index.eraseCertificate(certificate);
     answer = OK_MSSG;
-    this->skt.sendNumber(&answer);
+    this->skt->sendNumber(&answer);
     is_dead = true;
     return;
 }
@@ -76,5 +78,5 @@ bool RevokeClientProcessor::isDead() {
 
 
 void RevokeClientProcessor::stop() {
-    this->skt.stop();
+    this->skt->stop();
 }

@@ -11,6 +11,8 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <utility>
+#include <stdexcept>
+#include <iostream>
 #include "common_socket.h"
 
 #define MAX_WAITING_CLIENTS 20
@@ -38,16 +40,24 @@ Socket::Socket() {
 }
 
 Socket::Socket(int skt) {
+    if (skt == -1) {
+        throw std::runtime_error("Error accepting client");
+    }
     this->skt = skt;
 }
 
 void Socket::kill(){
-    shutdown(this->skt, SHUT_RDWR);
-    //close(this->skt);
+    if (this->skt != -1) {
+        shutdown(this->skt, SHUT_RDWR);
+        close(this->skt);
+        this->skt = -1;
+    }
 }
 
 Socket::~Socket() {
-    if (this->skt) {
+    // std::cout << "Destruyo socket básico: " << std::endl;
+    if (this->skt != -1) {
+        // std::cout << "Cerrando posta" << std::endl; 
         shutdown(this->skt, SHUT_RDWR);
         close(this->skt);
     }
@@ -161,10 +171,6 @@ int Socket::sendAll(void* buf, size_t size) {
     return bytes_sent;
 }
 
-/*********************************************************
- * 
- *                  VER
-*/
 
 Socket Socket::acceptClient(){
     int peerskt = accept(this->skt, NULL, NULL);
