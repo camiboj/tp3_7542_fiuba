@@ -135,11 +135,12 @@ int main(int argc, char* argv[]) {
     char* port = argv[2];
     Socket skt(host, port, 0);
     skt.connectWithServer();
+    MySocket my_socket(skt);
 
     if (mode == mode1) {
         std::string client_key_filename(argv[5]);
         std::string certificate_information_filename(argv[4]);
-        NewProcessor np(skt);
+        NewProcessor np(my_socket);
         np.run(client_key_filename, certificate_information_filename);
         return 0;
     }
@@ -148,7 +149,7 @@ int main(int argc, char* argv[]) {
         std::string certificate_filename = std::string(argv[4]);
         std::string client_key_filname = std::string(argv[5]);
         std::string server_key_filename = std::string(argv[6]);
-        RevokeProcessor rp(skt);
+        RevokeProcessor rp(my_socket);
         rp.run(certificate_filename, client_key_filname, server_key_filename);
         return 0;
     }

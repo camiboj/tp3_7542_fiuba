@@ -11,13 +11,13 @@
 #define PRIVATE_ENCRYPTION "Hash encriptado con la clave privada: "
 #define PUBLIC_ENCRYPTION "Huella enviada: "
 
-RevokeProcessor::RevokeProcessor(Socket& _skt) : skt(_skt) {}
+RevokeProcessor::RevokeProcessor(MySocket& _skt) : skt(_skt) {}
 RevokeProcessor::~RevokeProcessor() {}
 
 void RevokeProcessor::run(std::string certificate_filename,\
          std::string client_key_filname, std::string server_key_filename) {
     uint8_t command = 1;
-    skt.sendNumber(command);
+    this->skt.sendNumber(&command);
     Certificate certificate;
     uint32_t hash = certificate.send(certificate_filename, skt);
     Key server_key(server_key_filename);
@@ -25,9 +25,9 @@ void RevokeProcessor::run(std::string certificate_filename,\
     Rsa rsa(server_key, client_key);
     uint32_t priv_encryption = rsa.privateEncryption(hash);
     uint32_t publ_encryption = rsa.publicEncryption(priv_encryption);
-    skt.sendNumber(publ_encryption);
+    this->skt.sendNumber(&publ_encryption);
     uint8_t status = 0;
-    skt.reciveNumber(&status);
+    this->skt.reciveNumber(&status);
     if (status == HASH_ERROR_SM) {
         std::cout << HASH_ERROR_MSSG;
         return;

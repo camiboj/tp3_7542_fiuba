@@ -4,7 +4,7 @@
 #include <string>
 #include <queue>
 #include <functional>
-#include "common_socket.h"
+#include "common_my_socket.h"
 
 class Key {
     private:
@@ -32,8 +32,8 @@ class Key {
          * Módulo: en formato 2 bytes en big endian sin signo.
          * Exponente: en 1 byte.
         */
-        void send(Socket& skt);
-        void recive(Socket& skt);
+        void send(MySocket& skt);
+        void recive(MySocket& skt);
         friend std::ostream& operator<<(std::ostream&, const Key&);
         /*
          * Recibe un string y una función que al pasarle el exponente publico y

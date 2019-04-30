@@ -3,7 +3,6 @@
 #include <iostream>
 #include <fstream>
 #include <ios>
-#include "common_string.h"
 #include "common_certificate.h"
 #include "common_hash.h"
 #define CERTIFICATE "certificate:\n"
@@ -51,8 +50,8 @@ Certificate::Certificate(std::string _subject, std::string _not_before, \
  * exponent:        1 byte
  * module:          2 bytes
 */
-void Certificate::send(Socket& skt) {
-    skt.sendNumber(this->serial_number);
+void Certificate::send(MySocket& skt) {
+    skt.sendNumber(&this->serial_number);
     skt.sendAll(this->subject);
     skt.sendAll(this->not_before);
     skt.sendAll(this->not_after);
@@ -60,7 +59,7 @@ void Certificate::send(Socket& skt) {
 }
 
 
-void Certificate::recive(Socket& skt) {
+void Certificate::recive(MySocket& skt) {
     skt.reciveNumber(&this->serial_number);
     skt.reciveAll(this->subject);
     skt.reciveAll(this->not_before);
@@ -128,7 +127,7 @@ std::string Certificate::toString() {
  *8        modulus: 253 (0x00fd)
  *9        exponent: 19 (0x13)
 */
-uint32_t Certificate::send(std::string filename, Socket& skt) {
+uint32_t Certificate::send(std::string filename, MySocket& skt) {
     std::ifstream file;
     file.open(filename);
     std::string line;
@@ -155,7 +154,8 @@ uint32_t Certificate::send(std::string filename, Socket& skt) {
         line = line.substr(pos + 2,len);
         if (count == 1) {
             len = line.find(' ');
-            skt.sendNumber((uint32_t)std::stoi(line.substr(0, len)));
+            uint32_t n = (uint32_t) std::stoi(line.substr(0, len));
+            skt.sendNumber(&n);
         } else if ((count == 2) | (count == 5) | (count == 6)) {
             skt.sendAll(line);
         } else if (count == 8) {

@@ -15,9 +15,7 @@
 #include "common_socket.h"
 
 #define MAX_WAITING_CLIENTS 20
-#define UINT8_SIZE 1
-#define UINT16_SIZE 2
-#define UINT32_SIZE 4
+
 
 
 /******************************************************************************
@@ -54,6 +52,16 @@ Socket::Socket(const char* host, const char* port, int flag) {
     this->start(host, port, AI_PASSIVE);
 }
 
+Socket::Socket(int _skt, int _current_peerskt) : 
+skt(_skt), 
+current_peerskt(_current_peerskt) {}
+
+/*Socket::Socket(int _skt, int _current_peerskt, struct addrinfo *_result) {
+    this->skt = _skt;
+    this->current_peerskt = _current_peerskt;
+    this->result = _result;
+}*/
+
 bool Socket::reciveAll(void* buf, size_t len) {    
     memset(buf, 0, len);
     size_t received = 0;
@@ -73,75 +81,15 @@ bool Socket::reciveAll(void* buf, size_t len) {
     return is_there_an_error;
 }
 
-
-int Socket::reciveAll(std::string& str) {
-    uint32_t len = (uint32_t) str.length();
-    this->reciveNumber(&len);
-    char c;
-    int recived = 0;
-    for (size_t i = 0; i < len; ++i){
-        recived = recv(this->current_peerskt, &c , 1, MSG_NOSIGNAL);
-        str.append(1, c);
-    }
-    return recived;
-}
-
-void Socket::reciveNumber(uint8_t* n) {
-    this->reciveAll(n, UINT8_SIZE);
-}
-
-
-void Socket::reciveNumber(uint16_t* n) {
-    uint16_t aux;
-    this->reciveAll(&aux, UINT16_SIZE);
-    *n = htobe16(aux);
-}
-
-
-void Socket::reciveNumber(uint32_t* n) {
-    uint32_t aux;
-    this->reciveAll(&aux, UINT32_SIZE);
-    *n = htobe32(aux);
-}
-
 int Socket::reciveSome(void* buf, size_t size) {
     return recv(this->current_peerskt, buf , size, MSG_NOSIGNAL);
 }
 
-void Socket::sendNumber(uint8_t n) {
-    this->sendAll(&n, UINT8_SIZE);
+int Socket::reciveSome(void* buf, size_t size, int peerskt) {
+    return recv(peerskt, buf , size, MSG_NOSIGNAL);
 }
 
-void Socket::sendNumber(uint16_t n) {
-    uint16_t aux = htobe16(n);
-    this->sendAll(&aux, UINT16_SIZE);
-}
-
-void Socket::sendNumber(uint32_t n) {
-    uint32_t aux = htobe32(n);
-    this->sendAll(&aux, UINT32_SIZE);
-}
-
-int Socket::sendAll(std::string str) {  
-    uint32_t len = (uint32_t) str.length();
-    this->sendNumber(len);
-    int sent = 0;
-    for (size_t i = 0; i < len && sent >= 0; ++i){
-        sent = this->sendAll(&str[i], 1);
-    }
-    return sent;
-}
-
-int Socket::sendAll(void* buf, size_t size) {
-    //fprintf(stderr, "Envio\n");
-    /*
-    char* ptr = (char*) buf;
-    for (int i = 0; i<(int)size; i++) {
-        fprintf(stderr, "%02X\t", (uint8_t)ptr[i]);
-    }
-    fprintf(stderr, "\n");
-    */
-    
+int Socket::sendAll(void* buf, size_t size) {    
     int bytes_sent = 0;
     int s = 0;
     bool is_the_socket_valid = true;
@@ -151,7 +99,7 @@ int Socket::sendAll(void* buf, size_t size) {
         s = send(this->current_peerskt, &aux[bytes_sent], \
                 size-bytes_sent, MSG_NOSIGNAL);
         if (s <= 0) {
-            printf("Error: %s\n", strerror(errno));
+            //printf("Error: %s\n", strerror(errno));
             return -1;
         } else {
             bytes_sent += s;
@@ -162,7 +110,7 @@ int Socket::sendAll(void* buf, size_t size) {
 
 
 Socket::~Socket() {
-    freeaddrinfo(this->result);
+    if (this->skt == -1) return; 
     shutdown(this->skt, SHUT_RDWR);
     close(this->skt);
 }
@@ -194,19 +142,21 @@ bool Socket::connectWithClients() {
         return false;
     }
     return true;
+    freeaddrinfo(this->result);
 }
 
 void Socket::disableClient() {
-       // shutdown(this->current_peerskt, SHUT_RDWR); 
-        //close(this->current_peerskt);
+    shutdown(this->current_peerskt, SHUT_RDWR); 
+    close(this->current_peerskt);
 }
 
-//-1 si falla
-int Socket::acceptClient(){
+Socket* Socket::acceptClient(){
     int peerskt = accept(this->skt, NULL, NULL);
-    this->current_peerskt = peerskt;
-    return peerskt;
+    Socket* skt = new Socket(this->skt, peerskt);
+    return skt;
 }
+
+
 
 
 bool Socket::connectWithServer() {
@@ -228,4 +178,9 @@ bool Socket::connectWithServer() {
 
 void Socket::disablesSendOperations() {
     shutdown(this->skt, SHUT_WR);
+}
+
+void Socket::kill() {
+    shutdown(this->skt, SHUT_RDWR);
+    close(this->skt);
 }

@@ -2,28 +2,31 @@
 #define SERVER_NEW_CLIENT_PROCESSOR_H
 #include <stdint.h>
 #include <string>
+#include "server_thread.h"
 #include "common_socket.h"
 #include "common_key.h"
-#include "common_string.h"
 #include "server_index.h"
 
-class NewClientProcessor {
+class NewClientProcessor: public Thread {
     private:
+        MySocket& skt;
+        Index& index;
+        Key server_key;
         std::string subject;
         Key client_key;
         std::string date_from;
         std::string date_to;
-        Index& index;
-        Key server_key;
-        void reciveInfo(Socket& skt);
-        std::string createCertificate(Socket& skt);
-        bool checkCertificate(Socket& skt);
+        bool is_dead;
+        void reciveInfo();
+        std::string createCertificate();
+        bool checkCertificate();
+
 
     public:
         /*
         * Recibe los dos archivos necesarios para solicitar un nuevo aplicante
         */
-        NewClientProcessor(Index& _index, Key key);
+        NewClientProcessor(MySocket& skt, Index& _index, Key key);
         
         ~NewClientProcessor();
         /*  
@@ -40,7 +43,9 @@ class NewClientProcessor {
          * <date__size>     4 bytes big endian sin signo
          * <dat_to>         String sin ‘\0’
         */
-        int run(Socket& skt);
+        virtual void run() override;
+        virtual void stop() override;
+        virtual bool isDead() override; 
 };
 
 #endif

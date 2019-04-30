@@ -1,8 +1,8 @@
 #include <string>
 #include <iostream>
-#include "server_new_client_processor.h"
 #include "server_index.h"
-#include "server_revoke_client_processor.h"
+#include "server_acceptor.h"
+
 
 #define ERROR_CODE 1
 #define COMMAND_SIZE 1
@@ -126,32 +126,27 @@ int main(int argc, char* argv[]) {
 
     Socket skt(argv[1]);
     skt.connectWithClients();
-    skt.acceptClient();
-    
+
+
     std::string index_filename(argv[3]);
     Index index(index_filename);
     
+    
+    //skt.acceptClient();
     Key key(argv[2]);
+    Acceptor acceptor(skt, index, key);
+    acceptor.start();
 
-    int s;
-    uint8_t command;
-    skt.reciveSome(&command, COMMAND_SIZE);
+    std::string line;
+    while (std::getline(std::cin, line)) {
+        if (line == "q") {
+            acceptor.stop();
+            break;
+        }
+    }    
+    acceptor.join();
 
     
-    if (command == 0) {
-        NewClientProcessor ncp(index, key);
-        s = ncp.run(skt);
-        if (!s) {
-            return 1;
-        }
-    }
-    if (command == 1) {
-        RevokeClientProcessor rcp(index, key);
-        s = rcp.run(skt);
-        if (!s) {
-            return 1;
-        }
-    }
     index.write();    
     return 0;
 }

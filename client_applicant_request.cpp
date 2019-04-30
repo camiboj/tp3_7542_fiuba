@@ -2,8 +2,8 @@
 #include <sstream>
 #include <iostream>
 #include <string>
-#include "client_certificate_info_parser.h"
 #include "client_applicant_request.h"
+#include "client_certificate_info_parser.h"
 #include "common_time.h"
 #define COMMAND_SIZE 1
 
@@ -16,22 +16,13 @@ ApplicantRequest::ApplicantRequest(std::string& cert_filename,\
 }
 ApplicantRequest::~ApplicantRequest() {}
 
-void ApplicantRequest::send(Socket& skt) {
+void ApplicantRequest::send(MySocket& skt) {
     uint8_t command = 0;
-    //String sub_aux(this->subject);
-    //String from(this->date_from);
-    //String to(this->date_to);
-    
-    //skt.sendAll(&command, COMMAND_SIZE);
-    skt.sendNumber(command);
+    skt.sendNumber(&command);
     skt.sendAll(this->subject);
     key.send(skt);
     skt.sendAll(this->date_from);
     skt.sendAll(this->date_to);
-    //sub_aux.send(skt);
-    
-    //from.send(skt);
-    //to.send(skt);
 }
 
 std::string ApplicantRequest::getSubject(){

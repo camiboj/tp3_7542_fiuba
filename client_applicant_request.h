@@ -2,9 +2,8 @@
 #define CLIENT_APPLICANT_REQUEST_H
 #include <stdint.h>
 #include <string>
-#include "common_socket.h"
 #include "common_key.h"
-#include "common_string.h"
+#include "common_my_socket.h"
 
 
 class ApplicantRequest {
@@ -35,7 +34,7 @@ class ApplicantRequest {
          * <date__size>     4 bytes big endian sin signo
          * <dat_to>         String sin ‘\0’
         */
-        void send(Socket& skt);
+        void send(MySocket& skt);
         std::string getSubject();
 };
 

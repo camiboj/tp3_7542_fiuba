@@ -57,14 +57,14 @@ Key::Key(const Key &key) {
 
 Key::~Key() {}
 
-void Key::recive(Socket& skt) {
+void Key::recive(MySocket& skt) {
     skt.reciveNumber(&this->public_exponent);
     skt.reciveNumber(&this->module);
 }
 
-void Key::send(Socket& skt) {
-    skt.sendNumber(this->public_exponent);
-    skt.sendNumber(this->module);
+void Key::send(MySocket& skt) {
+    skt.sendNumber(&this->public_exponent);
+    skt.sendNumber(&this->module);
 }
 
 std::ostream& operator<<(std::ostream& o, const Key& self) {

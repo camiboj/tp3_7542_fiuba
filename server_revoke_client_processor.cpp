@@ -33,37 +33,47 @@
  * 3- Responde al cliente con un código 0
 */
 
-RevokeClientProcessor::RevokeClientProcessor(Index& _index, Key _key): 
+RevokeClientProcessor::RevokeClientProcessor(MySocket& _skt, Index& _index, Key _key):
+    skt(_skt),
     index(_index), 
-    server_key(_key) {}
+    server_key(_key),
+    is_dead(false) {}
 
 RevokeClientProcessor::~RevokeClientProcessor() {}
 
-int RevokeClientProcessor::run(Socket& skt) {
+void RevokeClientProcessor::run() {
     Certificate certificate;
     certificate.recive(skt);
     uint32_t encryption = 0;
-    skt.reciveNumber(&encryption);
-    //std::cout << "Encrypt: " << encryption << '\n';
+    this->skt.reciveNumber(&encryption);
     uint8_t answer;
-    if (!this->index.hasCertificate(certificate)) {
+    if (!this->index.hasCertificate(certificate)) { //ACA!
         answer = INVALID_CERTIFICATE_MSSG;
-        skt.sendNumber(answer);
-        return INVALID_CERTIFICATE;
+        this->skt.sendNumber(&answer);
+        return;
     }
     Rsa rsa(index.findCertificate(certificate), server_key);
     uint32_t desencrytion = rsa.privateDesencryption(encryption);
     uint32_t client_hash = rsa.publicDesencryption(desencrytion);
-    //std::cout << certificate.toString() << '\n';
     Hash hash(certificate.toString());
     uint32_t my_hash = hash();
     if (my_hash != client_hash) {
         answer = HASH_ERROR_MSSG;
-        skt.sendNumber(answer);
-        return HASH_ERROR;
+        this->skt.sendNumber(&answer);
+        return;
     }
     index.eraseCertificate(certificate);
     answer = OK_MSSG;
-    skt.sendNumber(answer);
-    return OK;
+    this->skt.sendNumber(&answer);
+    is_dead = true;
+    return;
+}
+
+bool RevokeClientProcessor::isDead() {
+   return is_dead;
+}
+
+
+void RevokeClientProcessor::stop() {
+    this->skt.stop();
 }

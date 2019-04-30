@@ -2,6 +2,7 @@
 #define SERVER_INDEX_H
 #include <string>
 #include <map>
+#include <mutex>
 #include "common_key.h"
 #include "common_certificate.h"
 
@@ -10,6 +11,7 @@ class Index {
         std::string& filename;
         std::map<std::string, Key> certificates;
         void parseLine(std::string& line);
+        std::mutex mutex;
 
     public:
         //Index();

@@ -4,15 +4,18 @@
 #include <string>
 #include "common_socket.h"
 #include "common_key.h"
-#include "common_string.h"
 #include "server_index.h"
+#include "common_my_socket.h"
+#include "server_thread.h"
 
-class RevokeClientProcessor {
+class RevokeClientProcessor : public Thread {
     private:
+        MySocket& skt;
         Index& index;
         Key server_key;
+        bool is_dead;
     public:
-        RevokeClientProcessor(Index& _index, Key key);
+        RevokeClientProcessor(MySocket& _skt, Index& _index, Key _key);
         
         ~RevokeClientProcessor();
         /*  
@@ -29,8 +32,10 @@ class RevokeClientProcessor {
          * <date__size>     4 bytes big endian sin signo
          * <dat_to>         String sin ‘\0’
         */
-        int run(Socket& skt);
+        virtual void run() override;
         //bool checkCertificate(Socket& skt);
+        virtual void stop() override;
+        virtual bool isDead() override; 
 };
 
 #endif

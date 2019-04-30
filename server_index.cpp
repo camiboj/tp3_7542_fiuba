@@ -7,12 +7,7 @@
 #include "common_key.h"
 #include "server_index.h"
 
-/******************************************************************************
- * 2
- * Federico Manuel Gomez Peter; 19 253
-*/
 
-//Index::Index(){}
 Index::~Index() {}
 
 Index::Index(std::string& _filename) : filename(_filename) {
@@ -63,11 +58,14 @@ void Index::parseLine(std::string& line) {
 
 
 bool Index::hasCertificate(std::string str) {
+    std::unique_lock<std::mutex> lock(this->mutex);
     std::map<std::string, Key>::iterator it = this->certificates.find(str);
-    return it != this->certificates.end();
+    bool result = it != this->certificates.end();
+    return result;
 }
 
 Key Index::findCertificate(Certificate cartificate) {
+    std::unique_lock<std::mutex> lock(this->mutex);
     std::map<std::string, Key>::iterator it = \
         this->certificates.find(cartificate.getSubject());
     return it->second;
@@ -78,15 +76,18 @@ bool Index::hasCertificate(Certificate certificate) {
 }
 
 void Index::saveCertificate(Certificate& certificate) {
+    std::unique_lock<std::mutex> lock(this->mutex);
     this->certificates.insert({certificate.getSubject(), certificate.getKey()});
     certificate.addSerialNumber(this->certificates.size());
 }
 
 void Index::eraseCertificate(std::string str) {
+    std::unique_lock<std::mutex> lock(this->mutex);
     this->certificates.erase(str);
 }
 
 void Index::eraseCertificate(Certificate certificate) {
+    std::unique_lock<std::mutex> lock(this->mutex);
     this->certificates.erase(certificate.getSubject());
 }
 

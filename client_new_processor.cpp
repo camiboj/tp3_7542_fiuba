@@ -19,7 +19,7 @@
 #define MH "Hash calculado: "
 
 
-NewProcessor::NewProcessor(Socket& _skt) : 
+NewProcessor::NewProcessor(MySocket& _skt) : 
 skt(_skt) {}
 
 NewProcessor::~NewProcessor() {}
@@ -55,11 +55,11 @@ void NewProcessor::run(std::string client_key_filename, \
     uint8_t notification = HASH_OK_SERVER_MSSG;
     if (my_hash != server_hash) {
         notification = HASH_ERROR_SERVER_MSSG;
-        skt.sendNumber(notification);
+        skt.sendNumber(&notification);
         std::cout << HASH_ERROR_MSSG;
         return;
     }
-    skt.sendNumber(notification);
+    skt.sendNumber(&notification);
     std::cout << CERT_FP << certificate_footprint << '\n';
     std::cout << SH << server_hash << '\n';
     std::cout << MH << my_hash << '\n';
