@@ -1,0 +1,10 @@
+certificate:
+	serial number: 1 (0x00000001)
+	subject: Federico Manuel Gomez Peter
+	issuer: Taller de programacion 1
+	validity:
+		not before: Mar 28 21:33:04 2019
+		not after: May 27 21:33:04 2019
+	subject public key info:
+		modulus: 253 (0x00fd)
+		exponent: 19 (0x13)
