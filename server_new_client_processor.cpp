@@ -68,6 +68,7 @@ std::string NewClientProcessor::createCertificate() {
              this->client_key);
     this->index.saveCertificate(certificate);
     std::string result = certificate.toString();
+    //std::cout << "Enviando certificado: " << result << std::endl;     
     certificate.send(*skt);
     return result;
 }
@@ -75,6 +76,7 @@ std::string NewClientProcessor::createCertificate() {
 bool NewClientProcessor::checkCertificate() {
     uint8_t answer = CERTIFICATE_OK;
     if (index.hasCertificate(this->subject)) { 
+        //std::cout << "Enviando certificate ERROR: " << std::endl;     
         answer = CERTIFICATE_ERROR;
         skt->sendNumber(&answer);
         //trow algo;

@@ -8,10 +8,10 @@
 */
 class MySocket {
     private:
-        Socket& skt;
+        Socket skt;
 
     public:
-        explicit MySocket(Socket& _skt);
+        explicit MySocket(Socket _skt);
         ~MySocket();
 
         void receiveNumber(uint8_t* n);

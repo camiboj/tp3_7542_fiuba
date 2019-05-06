@@ -46,8 +46,28 @@ Socket::Socket(int skt) {
     this->skt = skt;
 }
 
+
+Socket& Socket::operator=(Socket&& origin) {
+    if (this->skt != -1) {
+        //std::cout << "Copiando socket referencia move (?)" << std::endl; 
+        shutdown(this->skt, SHUT_RDWR);
+        close(this->skt);
+    }
+    
+    this->skt = origin.skt;
+    origin.skt = -1;
+    return *this;
+}
+
+Socket::Socket(Socket&& origin): skt(origin.skt) {
+    //std::cout << "Origin.skt = -1 WOWOWOWO" << std::endl; 
+    origin.skt = -1;
+}
+
+
 void Socket::kill(){
     if (this->skt != -1) {
+        //std::cout << "Cerrando posta con KILL" << std::endl; 
         shutdown(this->skt, SHUT_RDWR);
         close(this->skt);
         this->skt = -1;
@@ -55,9 +75,9 @@ void Socket::kill(){
 }
 
 Socket::~Socket() {
-    // std::cout << "Destruyo socket básico: " << std::endl;
+    //std::cout << "Destruyo socket básico: " << std::endl;
     if (this->skt != -1) {
-        // std::cout << "Cerrando posta" << std::endl; 
+        //std::cout << "Cerrando posta" << std::endl; 
         shutdown(this->skt, SHUT_RDWR);
         close(this->skt);
     }
@@ -118,8 +138,6 @@ bool Socket::connectWithServer(const char* host, const char* port) {
 
     for (ptr = result; ptr != NULL && are_we_connected == false;\
         ptr = ptr->ai_next) {
-        //this->skt = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
-        //if (this->skt == -1) continue;
         s = connect(this->skt, ptr->ai_addr, ptr->ai_addrlen);
         are_we_connected = (s != -1);
     }
@@ -178,12 +196,3 @@ Socket Socket::acceptClient(){
     return std::move(skt);
 }
 
-Socket& Socket::operator=(Socket&& origin) {
-    this->skt = origin.skt;
-    origin.skt = -1;
-    return *this;
-}
-
-Socket::Socket(Socket&& origin): skt(origin.skt) {
-    origin.skt = -1;
-}

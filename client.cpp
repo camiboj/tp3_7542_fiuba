@@ -135,7 +135,9 @@ int main(int argc, char* argv[]) {
     char* port = argv[2];
     Socket skt;
     skt.connectWithServer(host, port);
-    MySocket my_socket(skt);
+    //std::cerr << "Creado MySocket" << std::endl;
+    MySocket my_socket(std::move(skt));
+    //std::cerr << "Creado MySocket" << std::endl;
 
     if (mode == mode1) {
         std::string client_key_filename(argv[5]);

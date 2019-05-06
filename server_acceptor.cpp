@@ -5,23 +5,25 @@
 #include "server_revoke_client_processor.h"
 #include "common_key.h"
 
-Acceptor::Acceptor(Socket& _skt, Index& _index, Key _key): 
-    skt(_skt), 
+Acceptor::Acceptor(Socket _skt, Index& _index, Key _key):  
     index(_index), 
     key(_key),
-    keep_talking(true) {}
+    keep_talking(true) {
+        this->skt = std::move(_skt);
+    }
         
-void Acceptor::run() {    
+void Acceptor::run() {
     while (this->keep_talking) {
+        Socket client_skt;
         try {
-            this->client_skt = this->skt.acceptClient();
+            client_skt = this->skt.acceptClient();
         }
         catch (...) {
             break;
         }
 
         // std::cout << "Acepte un cliente!" << std::endl;
-        MySocket* my_socket = new MySocket(this->client_skt);
+        MySocket* my_socket = new MySocket(std::move(client_skt));
 
         uint8_t command;
         my_socket->receiveNumber(&command);

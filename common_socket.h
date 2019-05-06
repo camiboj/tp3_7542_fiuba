@@ -14,6 +14,7 @@ class Socket {
         Socket(int skt);
         Socket(Socket&& origin); 
         Socket& operator=(Socket&& origin);
+        Socket(const Socket& origin);
 
         void connectWithClients(const char* port);
         Socket acceptClient();

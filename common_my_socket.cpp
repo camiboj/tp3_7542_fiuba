@@ -5,12 +5,11 @@
 #define UINT16_SIZE 2
 #define UINT32_SIZE 4
 
-MySocket::MySocket(Socket& _skt): skt(_skt) {}
-
-MySocket::~MySocket() {
-    // std::cout << "Destruyendo MySocket!" << std::endl;
-    
+MySocket::MySocket(Socket _skt) {
+    skt = std::move(_skt);
 }
+
+MySocket::~MySocket() {}
 
 void MySocket::sendNumber(uint8_t* n) {
     this->skt.sendAll(n, UINT8_SIZE);
@@ -68,6 +67,4 @@ void MySocket::receiveNumber(uint32_t* n) {
     *n = htobe32(aux);
 }
 
-void MySocket::stop() {
-    //this->skt.disableClient();
-}
+void MySocket::stop() {}

@@ -133,7 +133,7 @@ int main(int argc, char* argv[]) {
     
     //skt.acceptClient();
     Key key(argv[2]);
-    Acceptor acceptor(skt, index, key);
+    Acceptor acceptor(std::move(skt), index, key);
     acceptor.start();
 
     std::string line;
