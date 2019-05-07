@@ -15,15 +15,15 @@
 
 class Acceptor : public Thread { 
     private:
-        Socket skt;
+        Socket& skt;
         Index& index;
-        Key key;
-        Socket client_skt;
+        Key& key;
+        //Socket client_skt;
         bool keep_talking;
         std::vector<Thread*> clients;
 
     public:
-        Acceptor(Socket _skt, Index& index, Key key);
+        Acceptor(Socket& _skt, Index& index, Key& key);
         ~Acceptor();
         virtual void run() override;
         virtual void stop() override;

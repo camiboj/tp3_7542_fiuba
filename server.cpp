@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
     //skt.acceptClient();
     std::string key_filename = std::string(argv[2]);
     Key key(key_filename);
-    Acceptor acceptor(std::move(skt), index, key);
+    Acceptor acceptor(skt, index, key);
     acceptor.start();
 
     std::string line;

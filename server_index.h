@@ -22,7 +22,7 @@ class Index {
         bool hasCertificate(std::string& str);
         bool hasCertificate(Certificate& certificate);
         Key findCertificate(Certificate& cartificate);
-        void eraseCertificate(Certificate certificate);
+        void eraseCertificate(Certificate& certificate);
         void eraseCertificate(std::string& str);
 
         explicit Index(std::string& filename);

@@ -34,7 +34,7 @@
 */
 
 RevokeClientProcessor::RevokeClientProcessor(Protocol* _skt,\
-                                             Index& _index, Key _key):
+                                             Index& _index, Key& _key):
     skt(_skt),
     index(_index), 
     server_key(_key),

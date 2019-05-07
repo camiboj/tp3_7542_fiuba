@@ -5,7 +5,8 @@
 #include "server_revoke_client_processor.h"
 #include "common_key.h"
 
-Acceptor::Acceptor(Socket _skt, Index& _index, Key _key):  
+Acceptor::Acceptor(Socket& _skt, Index& _index, Key& _key):  
+    skt(_skt),
     index(_index), 
     key(_key),
     keep_talking(true) {
@@ -23,17 +24,17 @@ void Acceptor::run() {
         }
 
         // std::cout << "Acepte un cliente!" << std::endl;
-        Protocol* my_socket = new Protocol(std::move(client_skt));
+        Protocol* protocol = new Protocol(std::move(client_skt));
 
         uint8_t command;
-        my_socket->receiveNumber(&command);
+        protocol->receiveNumber(&command);
         
         Thread* client;
         if (command == 0) {
-            client = new NewClientProcessor(my_socket, index, key);
+            client = new NewClientProcessor(protocol, index, key);
         }
         if (command == 1) {
-            client = new RevokeClientProcessor(my_socket, index, key);
+            client = new RevokeClientProcessor(protocol, index, key);
         }
         this->clients.push_back(client);
         client->start();

@@ -12,11 +12,11 @@ class RevokeClientProcessor : public Thread {
     private:
         Protocol* skt;
         Index& index;
-        Key server_key;
+        Key& server_key;
         bool is_dead;
         
     public:
-        RevokeClientProcessor(Protocol* _skt, Index& _index, Key _key);
+        RevokeClientProcessor(Protocol* _skt, Index& _index, Key& _key);
         
         ~RevokeClientProcessor();
         /*  

@@ -11,7 +11,7 @@ class NewClientProcessor: public Thread {
     private:
         Protocol* skt;
         Index& index;
-        Key server_key;
+        Key& server_key;
         std::string subject;
         Key client_key;
         std::string date_from;
@@ -26,7 +26,7 @@ class NewClientProcessor: public Thread {
         /*
         * Recibe los dos archivos necesarios para solicitar un nuevo aplicante
         */
-        NewClientProcessor(Protocol* skt, Index& _index, Key key);
+        NewClientProcessor(Protocol* skt, Index& _index, Key& key);
         
         ~NewClientProcessor();
         /*  

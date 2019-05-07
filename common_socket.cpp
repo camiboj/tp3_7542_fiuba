@@ -49,7 +49,6 @@ Socket::Socket(int skt) {
 
 Socket& Socket::operator=(Socket&& origin) {
     if (this->skt != -1) {
-        //std::cout << "Copiando socket referencia move (?)" << std::endl; 
         shutdown(this->skt, SHUT_RDWR);
         close(this->skt);
     }
@@ -59,15 +58,13 @@ Socket& Socket::operator=(Socket&& origin) {
     return *this;
 }
 
-Socket::Socket(Socket&& origin): skt(origin.skt) {
-    //std::cout << "Origin.skt = -1 WOWOWOWO" << std::endl; 
+Socket::Socket(Socket&& origin): skt(origin.skt) {; 
     origin.skt = -1;
 }
 
 
 void Socket::kill(){
     if (this->skt != -1) {
-        //std::cout << "Cerrando posta con KILL" << std::endl; 
         shutdown(this->skt, SHUT_RDWR);
         close(this->skt);
         this->skt = -1;
@@ -75,9 +72,7 @@ void Socket::kill(){
 }
 
 Socket::~Socket() {
-    //std::cout << "Destruyo socket básico: " << std::endl;
     if (this->skt != -1) {
-        //std::cout << "Cerrando posta" << std::endl; 
         shutdown(this->skt, SHUT_RDWR);
         close(this->skt);
     }
@@ -155,9 +150,10 @@ bool Socket::receiveAll(void* buf, size_t len) {
     char* aux = (char*) buf;
     while (received < len && !is_there_an_error) {
         status = this->receiveSome(&aux[received], len - received);
-        if (status == 0) { 
-            is_there_an_error = true;
-        } else if (status < 0) { 
+        //if (status == 0) { 
+        //    is_there_an_error = true;
+        //} else 
+        if (status < 0) { 
             is_there_an_error = true;
         } else {
             received += status;

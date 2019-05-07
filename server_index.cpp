@@ -90,7 +90,7 @@ void Index::eraseCertificate(std::string& str) {
     this->certificates.erase(str);
 }
 
-void Index::eraseCertificate(Certificate certificate) {
+void Index::eraseCertificate(Certificate& certificate) {
     std::unique_lock<std::mutex> lock(this->mutex);
     this->certificates.erase(certificate.getSubject());
 }
