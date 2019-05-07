@@ -135,24 +135,25 @@ int main(int argc, char* argv[]) {
     char* port = argv[2];
     Socket skt;
     skt.connectWithServer(host, port);
-    //std::cerr << "Creado MySocket" << std::endl;
-    MySocket my_socket(std::move(skt));
-    //std::cerr << "Creado MySocket" << std::endl;
+    //std::cerr << "Creado Protocol" << std::endl;
+    Protocol my_socket(std::move(skt));
+    //std::cerr << "Creado Protocol" << std::endl;
+
+    std::string client_key_filename = std::string(argv[5]);
+    std::string server_key_filename = std::string(argv[6]);
 
     if (mode == mode1) {
-        std::string client_key_filename(argv[5]);
         std::string certificate_information_filename(argv[4]);
+        
         NewProcessor np(my_socket);
-        np.run(client_key_filename, certificate_information_filename);
+        np.run(certificate_information_filename, client_key_filename, server_key_filename);
         return 0;
     }
 
     if (mode == mode2) { //std::string(argv[4])
         std::string certificate_filename = std::string(argv[4]);
-        std::string client_key_filname = std::string(argv[5]);
-        std::string server_key_filename = std::string(argv[6]);
         RevokeProcessor rp(my_socket);
-        rp.run(certificate_filename, client_key_filname, server_key_filename);
+        rp.run(certificate_filename, client_key_filename, server_key_filename);
         return 0;
     }
     return 0;

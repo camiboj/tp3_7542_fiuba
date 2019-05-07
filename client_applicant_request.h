@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <string>
 #include "common_key.h"
-#include "common_my_socket.h"
+#include "common_protocol.h"
 
 
 class ApplicantRequest {
@@ -34,8 +34,9 @@ class ApplicantRequest {
          * <date__size>     4 bytes big endian sin signo
          * <dat_to>         String sin ‘\0’
         */
-        void send(MySocket& skt);
+        void send(Protocol& skt);
         std::string getSubject();
+        Key getClientKey();
 };
 
 #endif

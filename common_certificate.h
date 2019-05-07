@@ -5,7 +5,7 @@
 #include <queue>
 #include <istream>
 #include "common_key.h"
-#include "common_my_socket.h"
+#include "common_protocol.h"
 
 class Certificate {
     private:
@@ -24,17 +24,11 @@ class Certificate {
         /*
         * Se envian los datos del certificado por el socket.
         */
-        void send(MySocket& skt);
-        /*
-        * Se lee el archivo contenedor del certificado,
-        * se envian los datos a traves del socket
-        * y se devuelve el valor del certificado hasheado
-        */
-        uint32_t send(std::string filename, MySocket& skt);
+        void send(Protocol& skt);
         /*
         * Se reciben los datos del certificado por el socket.
         */
-        void receive(MySocket& skt);
+        void receive(Protocol& skt);
         /*
          * Seter del serial number
         */
@@ -57,7 +51,6 @@ class Certificate {
         std::string getSubject();
         Key getKey();
         friend std::ostream& operator<<(std::ostream &o, Certificate& self);
-        //friend std::istream& operator>> (std::istream &in, Certificate& self);
 };
 
 #endif

@@ -4,7 +4,7 @@
 #include <string>
 #include <queue>
 #include <functional>
-#include "common_my_socket.h"
+#include "common_protocol.h"
 
 class Key {
     private:
@@ -15,8 +15,8 @@ class Key {
     public:
         Key();
         Key(const Key &self);
-        Key(std::string _public_exponent, std::string _module);
-        explicit Key(std::string filename);
+        Key(std::string& _public_exponent, std::string& _module);
+        explicit Key(std::string& filename);
         ~Key();
         /*
          * Recibe el nombre de un archivo de tipo
@@ -25,15 +25,15 @@ class Key {
          * Los distintos campos pueden  estar separados  por 1 o más espacios,
          * únicamente se garantiza que estos se encuentran en una misma línea.
         */
-        void set(std::string filename);
-        void set(std::string _public_exponent, std::string _module);
+        void set(std::string& filename);
+        void set(std::string& _public_exponent, std::string& _module);
         /*
          * Envia, a traves del socket pasado por parametro:
          * Módulo: en formato 2 bytes en big endian sin signo.
          * Exponente: en 1 byte.
         */
-        void send(MySocket& skt);
-        void receive(MySocket& skt);
+        void send(Protocol& skt);
+        void receive(Protocol& skt);
         friend std::ostream& operator<<(std::ostream&, const Key&);
         /*
          * Recibe un string y una función que al pasarle el exponente publico y

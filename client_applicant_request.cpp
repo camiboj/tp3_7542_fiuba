@@ -16,7 +16,7 @@ ApplicantRequest::ApplicantRequest(std::string& cert_filename,\
 }
 ApplicantRequest::~ApplicantRequest() {}
 
-void ApplicantRequest::send(MySocket& skt) {
+void ApplicantRequest::send(Protocol& skt) {
     uint8_t command = 0;
     skt.sendNumber(&command);
     skt.sendAll(this->subject);
@@ -25,6 +25,10 @@ void ApplicantRequest::send(MySocket& skt) {
     skt.sendAll(this->date_to);
 }
 
-std::string ApplicantRequest::getSubject(){
+std::string ApplicantRequest::getSubject() {
     return this->subject;
+}
+
+Key ApplicantRequest::getClientKey() {
+    return this->key;
 }

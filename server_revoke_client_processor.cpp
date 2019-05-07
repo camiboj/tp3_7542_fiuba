@@ -33,7 +33,7 @@
  * 3- Responde al cliente con un código 0
 */
 
-RevokeClientProcessor::RevokeClientProcessor(MySocket* _skt,\
+RevokeClientProcessor::RevokeClientProcessor(Protocol* _skt,\
                                              Index& _index, Key _key):
     skt(_skt),
     index(_index), 
@@ -58,9 +58,12 @@ void RevokeClientProcessor::run() {
     Rsa rsa(index.findCertificate(certificate), server_key);
     uint32_t desencrytion = rsa.privateDesencryption(encryption);
     uint32_t client_hash = rsa.publicDesencryption(desencrytion);
-    Hash hash(certificate.toString());
+    std::string formal_certificate = certificate.toString();
+    Hash hash(formal_certificate);
     uint32_t my_hash = hash();
     if (my_hash != client_hash) {
+        //std::cerr << "client hash: " << client_hash << '\n';
+        //std::cerr << "my hash: " << my_hash << '\n';
         answer = HASH_ERROR_MSSG;
         this->skt->sendNumber(&answer);
         return;

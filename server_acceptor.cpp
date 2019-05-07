@@ -1,6 +1,6 @@
 #include <vector>
 #include "server_acceptor.h"
-#include "common_my_socket.h"
+#include "common_protocol.h"
 #include "server_new_client_processor.h"
 #include "server_revoke_client_processor.h"
 #include "common_key.h"
@@ -23,7 +23,7 @@ void Acceptor::run() {
         }
 
         // std::cout << "Acepte un cliente!" << std::endl;
-        MySocket* my_socket = new MySocket(std::move(client_skt));
+        Protocol* my_socket = new Protocol(std::move(client_skt));
 
         uint8_t command;
         my_socket->receiveNumber(&command);

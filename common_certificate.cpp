@@ -16,18 +16,7 @@
 #define KEY "\tsubject public key info:\n"
 #define MODULE "\t\tmodulus: "
 #define EXPONENT "\t\texponent: "
-/******************************************************************************
- * certificate:
- *    serial number: 1 (0x00000001)
- *    subject: Federico Manuel Gomez Peter
- *    issuer: Taller de programacion 1
- *    validity:
- *        not before: Mar 28 21:33:04 2019
- *        not after: May 27 21:33:04 2019
- *    subject public key info:
- *        modulus: 253 (0x00fd)
- *        exponent: 19 (0x13)
-*/
+
 Certificate::Certificate() {}
 
 Certificate::Certificate(std::string _subject, std::string _not_before, \
@@ -39,18 +28,7 @@ Certificate::Certificate(std::string _subject, std::string _not_before, \
     key(_key) {
 }
 
-/******************************************************************************
- * serial_num:      1byte
- * subject_len:     4 bytes be
- * subject;         string
- * not_before_len:  4 bytes be
- * not_before:      string
- * not_after_len:   4 bytes be
- * not_before:      string
- * exponent:        1 byte
- * module:          2 bytes
-*/
-void Certificate::send(MySocket& skt) {
+void Certificate::send(Protocol& skt) {
     skt.sendNumber(&this->serial_number);
     skt.sendAll(this->subject);
     skt.sendAll(this->not_before);
@@ -59,7 +37,7 @@ void Certificate::send(MySocket& skt) {
 }
 
 
-void Certificate::receive(MySocket& skt) {
+void Certificate::receive(Protocol& skt) {
     skt.receiveNumber(&this->serial_number);
     skt.receiveAll(this->subject);
     skt.receiveAll(this->not_before);
@@ -113,63 +91,6 @@ std::string Certificate::toString() {
     k.printPublicExponent(o, toHexaString);
 
     return o;
-}
-
-/******************************************************************************
- *0 certificate:
- *1    serial number: 1 (0x00000001)
- *2    subject: Federico Manuel Gomez Peter
- *3    issuer: Taller de programacion 1
- *4    validity:
- *5        not before: Mar 28 21:33:04 2019
- *6        not after: May 27 21:33:04 2019
- *7    subject public key info:
- *8        modulus: 253 (0x00fd)
- *9        exponent: 19 (0x13)
-*/
-uint32_t Certificate::send(std::string filename, MySocket& skt) {
-    std::ifstream file;
-    file.open(filename);
-    std::string line;
-    int count = 0;
-    int pos;
-    int len;
-    std::string module;
-    std::string exp;
-    Hash hash;
-    while (std::getline(file, line, '\n')) {
-        if (!file.eof()) {
-            hash.load(line + '\n');
-        } else {
-            hash.load(line);
-        }
-        //// std::cout << "Line: " << line << '\n';
-        pos = line.find(':');
-        line = line.c_str();
-        len = line.length();
-        if (pos + 2 > len) { //certificate:\0
-            ++count;
-            continue;
-        }
-        line = line.substr(pos + 2,len);
-        if (count == 1) {
-            len = line.find(' ');
-            uint32_t n = (uint32_t) std::stoi(line.substr(0, len));
-            skt.sendNumber(&n);
-        } else if ((count == 2) | (count == 5) | (count == 6)) {
-            skt.sendAll(line);
-        } else if (count == 8) {
-            len = line.find(' ');
-            module = line.substr(0, len);
-        } else if (count == 9) {
-            len = line.find(' ');
-            exp = line.substr(0, len);
-        }        
-        ++count;
-    }
-    Key key(exp, module);
-    key.send(skt);
-    return hash();
 }
 
 std::ostream& operator<<(std::ostream &o, Certificate& self) {

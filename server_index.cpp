@@ -15,6 +15,8 @@ Index::Index(std::string& _filename) : filename(_filename) {
     file.open(filename); 
     std::string line;
     std::getline(file, line, '\n');
+    this->serial_number = (uint32_t) atoi(line.c_str());
+    if (!this->serial_number) this->serial_number = 1;
     while (std::getline(file, line, '\n')) {
         this->parseLine(line);
     }
@@ -57,31 +59,33 @@ void Index::parseLine(std::string& line) {
 }
 
 
-bool Index::hasCertificate(std::string str) {
+bool Index::hasCertificate(std::string& str) {
     std::unique_lock<std::mutex> lock(this->mutex);
     std::map<std::string, Key>::iterator it = this->certificates.find(str);
     bool result = it != this->certificates.end();
     return result;
 }
 
-Key Index::findCertificate(Certificate cartificate) {
+Key Index::findCertificate(Certificate& cartificate) {
     std::unique_lock<std::mutex> lock(this->mutex);
     std::map<std::string, Key>::iterator it = \
         this->certificates.find(cartificate.getSubject());
     return it->second;
 }
 
-bool Index::hasCertificate(Certificate certificate) {
-    return this->hasCertificate(certificate.getSubject());
+bool Index::hasCertificate(Certificate& certificate) {
+    std::string subj = certificate.getSubject();
+    return this->hasCertificate(subj);
 }
 
 void Index::saveCertificate(Certificate& certificate) {
     std::unique_lock<std::mutex> lock(this->mutex);
     this->certificates.insert({certificate.getSubject(), certificate.getKey()});
-    certificate.addSerialNumber(this->certificates.size());
+    certificate.addSerialNumber(this->serial_number);
+    this->serial_number ++;
 }
 
-void Index::eraseCertificate(std::string str) {
+void Index::eraseCertificate(std::string& str) {
     std::unique_lock<std::mutex> lock(this->mutex);
     this->certificates.erase(str);
 }
@@ -98,7 +102,7 @@ void Index::write() {
     if (!file.is_open()) {
         //exc
     }
-    file << std::to_string(this->certificates.size() + 1) << '\n';
+    file << std::to_string(this->serial_number) << '\n';
     std::map<std::string, Key>::iterator it = this->certificates.begin();
     for (; it != this->certificates.end(); ++it) {
         file << it->first << "; " << it->second << '\n';
