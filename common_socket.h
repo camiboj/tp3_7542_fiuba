@@ -22,7 +22,7 @@ class Socket {
         void connectWithServer(const char* host, const char* port);
         
 
-        bool receiveAll(void* buf, size_t len);
+        void receiveAll(void* buf, size_t len);
         int receiveSome(void* buf, size_t size);
         int sendAll(void* buf, size_t size);
 
