@@ -11,7 +11,7 @@ class Protocol {
         Socket skt;
 
     public:
-        explicit Protocol(Socket _skt);
+        explicit Protocol(Socket& _skt);
         ~Protocol();
 
         void receiveNumber(uint8_t* n);

@@ -1,3 +1,7 @@
+echo
+echo ------- CERTIFICATE CREATE -------
+echo
+
 cd ../../../
 make -f Makefile_client_server	
 cd pruebas/02secuencial-con-valgrind/create-certificate
@@ -19,3 +23,9 @@ echo 04 - ServerError
 diff __server_stderr__ __server_stderr___ 
 echo 05 - ServerOut
 diff __server_stdout__ __server_stdout___
+echo
+echo 06 - Server Valgrind
+cat valgrind_server.out
+echo
+echo 07 - Client VAlgrind
+cat valgrind_client0.out

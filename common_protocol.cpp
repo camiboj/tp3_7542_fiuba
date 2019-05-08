@@ -5,7 +5,7 @@
 #define UINT16_SIZE 2
 #define UINT32_SIZE 4
 
-Protocol::Protocol(Socket _skt) {
+Protocol::Protocol(Socket& _skt) {
     skt = std::move(_skt);
 }
 

@@ -15,7 +15,7 @@
 
 class Acceptor : public Thread { 
     private:
-        Socket& skt;
+        Socket skt;
         Index& index;
         Key& key;
         //Socket client_skt;

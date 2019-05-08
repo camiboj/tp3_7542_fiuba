@@ -1,5 +1,4 @@
 cd ../../../
-make -f Makefile_client_server clean
 make -f Makefile_client_server	
 cd pruebas/04paralelo-con-valgrind/create-certificate
 cp ../../../client ../../../server ../create-certificate
@@ -11,7 +10,7 @@ chmod +x run.sh free_port.sh;./run.sh 127.0.0.1 $(./free_port.sh 12001) valgrind
 
 
 echo Ceritificado de Fede
-diff "Federico Gomez Peter.cert" "Federico Gomez Peter_.cert"
+diff "Federico Manuel Gomez Peter.cert" "Federico Manuel Gomez Peter_.cert"
 echo Certificate Client0
 diff "client0.out" "client0_.out"
 echo Index
@@ -20,3 +19,9 @@ echo ServerError
 diff __server_stderr__ __server_stderr___ 
 echo ServerOut
 diff __server_stdout__ __server_stdout___
+echo
+echo 06 - Server Valgrind
+cat valgrind_server.out
+echo
+echo 07 - Client VAlgrind
+cat valgrind_client0.out

@@ -6,7 +6,6 @@
 #include "common_key.h"
 
 Acceptor::Acceptor(Socket& _skt, Index& _index, Key& _key):  
-    skt(_skt),
     index(_index), 
     key(_key),
     keep_talking(true) {
@@ -24,7 +23,7 @@ void Acceptor::run() {
         }
 
         // std::cout << "Acepte un cliente!" << std::endl;
-        Protocol* protocol = new Protocol(std::move(client_skt));
+        Protocol* protocol = new Protocol(client_skt);
 
         uint8_t command;
         protocol->receiveNumber(&command);

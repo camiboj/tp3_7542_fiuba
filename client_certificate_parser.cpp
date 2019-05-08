@@ -45,6 +45,27 @@ CertificateParser::CertificateParser(std::string& filename, Protocol& skt) {
     key.send(skt);
 }
 
+/*std::ifstream file(filename);
+std::string key;
+char aux;
+// certificate:
+std::getline(file, key);
+// subject:
+std::getline(file, key, ':');
+// el espacio después de los dos puntos
+file >> aux;
+// valor
+std::getline(file, this->subject);
+// issuer:
+std::getline(file, key, ':');
+file >> aux;
+std::getline(file, this->issuer);
+... // se repite para los strings
+//modulus:
+std::getline(file, key, ':');
+//el operador >> trimea los espacios al buscar numeros
+file >> this->modulus;*/
+
 uint32_t CertificateParser::hashCertificate() {
     return this->hash();
 }
