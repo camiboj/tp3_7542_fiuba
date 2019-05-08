@@ -13,7 +13,7 @@ class Rsa {
         uint8_t private_exponent;
         uint16_t private_module;
     public:
-        Rsa(Key public_key, Key private_key);
+        Rsa(Key& public_key, Key& private_key);
         ~Rsa();
 
         /*

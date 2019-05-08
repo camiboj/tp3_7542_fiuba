@@ -11,23 +11,23 @@
 #define MODULE_POS 2
 
 
-Key::Key(std::string _public_exponent, std::string _module) {
+Key::Key(std::string& _public_exponent, std::string& _module) {
     this->public_exponent = (uint8_t) atoi(_public_exponent.c_str());
     this->module = (uint8_t) atoi(_module.c_str());
 }
 
 Key::Key() {}
 
-void Key::set(std::string _public_exponent, std::string _module){
+void Key::set(std::string& _public_exponent, std::string& _module){
     this->public_exponent = (uint8_t) atoi(_public_exponent.c_str());
     this->module = (uint8_t) atoi(_module.c_str());
 }
 
-Key::Key(std::string filename) {
+Key::Key(std::string& filename) {
     this->set(filename);
 }
 
-void Key::set(std::string filename) {
+void Key::set(std::string& filename) {
     std::ifstream file;
     file.open(filename); 
     std::string line;
@@ -57,14 +57,14 @@ Key::Key(const Key &key) {
 
 Key::~Key() {}
 
-void Key::receive(MySocket& skt) {
-    skt.receiveNumber(&this->public_exponent);
-    skt.receiveNumber(&this->module);
+void Key::receive(Protocol& skt) {
+    skt.receive(this->public_exponent);
+    skt.receive(this->module);
 }
 
-void Key::send(MySocket& skt) {
-    skt.sendNumber(&this->public_exponent);
-    skt.sendNumber(&this->module);
+void Key::send(Protocol& skt) {
+    skt.send(this->public_exponent);
+    skt.send(this->module);
 }
 
 std::ostream& operator<<(std::ostream& o, const Key& self) {

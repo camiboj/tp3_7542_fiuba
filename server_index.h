@@ -12,17 +12,18 @@ class Index {
         std::map<std::string, Key> certificates;
         void parseLine(std::string& line);
         std::mutex mutex;
+        uint32_t serial_number;
 
     public:
         //Index();
         void write();
         void saveCertificate(Certificate& certificate);
         
-        bool hasCertificate(std::string str);
-        bool hasCertificate(Certificate certificate);
-        Key findCertificate(Certificate cartificate);
-        void eraseCertificate(Certificate certificate);
-        void eraseCertificate(std::string str);
+        bool hasCertificate(std::string& str);
+        bool hasCertificate(Certificate& certificate);
+        Key findCertificate(Certificate& cartificate);
+        void eraseCertificate(Certificate& certificate);
+        void eraseCertificate(std::string& str);
 
         explicit Index(std::string& filename);
         ~Index();

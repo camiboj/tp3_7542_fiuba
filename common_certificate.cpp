@@ -16,54 +16,31 @@
 #define KEY "\tsubject public key info:\n"
 #define MODULE "\t\tmodulus: "
 #define EXPONENT "\t\texponent: "
-/******************************************************************************
- * certificate:
- *    serial number: 1 (0x00000001)
- *    subject: Federico Manuel Gomez Peter
- *    issuer: Taller de programacion 1
- *    validity:
- *        not before: Mar 28 21:33:04 2019
- *        not after: May 27 21:33:04 2019
- *    subject public key info:
- *        modulus: 253 (0x00fd)
- *        exponent: 19 (0x13)
-*/
 Certificate::Certificate() {}
 
-Certificate::Certificate(std::string _subject, std::string _not_before, \
-                        std::string _not_after, Key _key):
-    subject(_subject),
-    issuer(ISSUER),
-    not_before(_not_before),
-    not_after(_not_after),
+Certificate::Certificate(std::string& _subject, std::string& _not_before, \
+                        std::string& _not_after, Key _key):
     key(_key) {
+            subject = std::move(_subject);
+            issuer = std::string(ISSUER);
+            not_before = std::move(_not_before);
+            not_after = std::move(_not_after);
 }
 
-/******************************************************************************
- * serial_num:      1byte
- * subject_len:     4 bytes be
- * subject;         string
- * not_before_len:  4 bytes be
- * not_before:      string
- * not_after_len:   4 bytes be
- * not_before:      string
- * exponent:        1 byte
- * module:          2 bytes
-*/
-void Certificate::send(MySocket& skt) {
-    skt.sendNumber(&this->serial_number);
-    skt.sendAll(this->subject);
-    skt.sendAll(this->not_before);
-    skt.sendAll(this->not_after);
+void Certificate::send(Protocol& skt) {
+    skt.send(this->serial_number);
+    skt.send(this->subject);
+    skt.send(this->not_before);
+    skt.send(this->not_after);
     this->key.send(skt);
 }
 
 
-void Certificate::receive(MySocket& skt) {
-    skt.receiveNumber(&this->serial_number);
-    skt.receiveAll(this->subject);
-    skt.receiveAll(this->not_before);
-    skt.receiveAll(this->not_after);
+void Certificate::receive(Protocol& skt) {
+    skt.receive(this->serial_number);
+    skt.receive(this->subject);
+    skt.receive(this->not_before);
+    skt.receive(this->not_after);
     this->key.receive(skt);
 }
 
@@ -115,19 +92,7 @@ std::string Certificate::toString() {
     return o;
 }
 
-/******************************************************************************
- *0 certificate:
- *1    serial number: 1 (0x00000001)
- *2    subject: Federico Manuel Gomez Peter
- *3    issuer: Taller de programacion 1
- *4    validity:
- *5        not before: Mar 28 21:33:04 2019
- *6        not after: May 27 21:33:04 2019
- *7    subject public key info:
- *8        modulus: 253 (0x00fd)
- *9        exponent: 19 (0x13)
-*/
-uint32_t Certificate::send(std::string filename, MySocket& skt) {
+uint32_t Certificate::send(std::string& filename, Protocol& skt) {
     std::ifstream file;
     file.open(filename);
     std::string line;
@@ -139,7 +104,8 @@ uint32_t Certificate::send(std::string filename, MySocket& skt) {
     Hash hash;
     while (std::getline(file, line, '\n')) {
         if (!file.eof()) {
-            hash.load(line + '\n');
+            std::string aux = line + '\n';
+            hash.load(aux);
         } else {
             hash.load(line);
         }
@@ -155,9 +121,9 @@ uint32_t Certificate::send(std::string filename, MySocket& skt) {
         if (count == 1) {
             len = line.find(' ');
             uint32_t n = (uint32_t) std::stoi(line.substr(0, len));
-            skt.sendNumber(&n);
+            skt.send(n);
         } else if ((count == 2) | (count == 5) | (count == 6)) {
-            skt.sendAll(line);
+            skt.send(line);
         } else if (count == 8) {
             len = line.find(' ');
             module = line.substr(0, len);
@@ -181,6 +147,6 @@ std::ostream& operator<<(std::ostream &o, Certificate& self) {
 
 Certificate::~Certificate() {}
 
-void Certificate::addSerialNumber(uint32_t _serial_number) {
+void Certificate::addSerial(uint32_t _serial_number) {
     this->serial_number = _serial_number;
 }

@@ -5,18 +5,18 @@
 #include "common_socket.h"
 #include "common_key.h"
 #include "server_index.h"
-#include "common_my_socket.h"
+#include "common_protocol.h"
 #include "server_thread.h"
 
 class RevokeClientProcessor : public Thread {
     private:
-        MySocket* skt;
+        Protocol skt;
         Index& index;
-        Key server_key;
+        Key& server_key;
         bool is_dead;
         
     public:
-        RevokeClientProcessor(MySocket* _skt, Index& _index, Key _key);
+        RevokeClientProcessor(Protocol& _skt, Index& _index, Key& _key);
         
         ~RevokeClientProcessor();
         /*  

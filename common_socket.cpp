@@ -13,7 +13,9 @@
 #include <utility>
 #include <stdexcept>
 #include <iostream>
+#include <string>
 #include "common_socket.h"
+
 
 #define MAX_WAITING_CLIENTS 20
 
@@ -34,14 +36,14 @@ Socket::Socket() {
     int s = socket(familia_skt, tipo_skt, protocolo_skt);
 
     if (!s) {
-        //throw
+        throw std::runtime_error("Error creating socket");
     }
     this->skt = s;
 }
 
 Socket::Socket(int skt) {
     if (skt == -1) {
-        throw std::runtime_error("Error accepting client");
+        throw std::runtime_error("Error creating socket");
     }
     this->skt = skt;
 }
@@ -49,7 +51,6 @@ Socket::Socket(int skt) {
 
 Socket& Socket::operator=(Socket&& origin) {
     if (this->skt != -1) {
-        //std::cout << "Copiando socket referencia move (?)" << std::endl; 
         shutdown(this->skt, SHUT_RDWR);
         close(this->skt);
     }
@@ -60,14 +61,12 @@ Socket& Socket::operator=(Socket&& origin) {
 }
 
 Socket::Socket(Socket&& origin): skt(origin.skt) {
-    //std::cout << "Origin.skt = -1 WOWOWOWO" << std::endl; 
-    origin.skt = -1;
+    origin.skt = -1; 
 }
 
 
 void Socket::kill(){
     if (this->skt != -1) {
-        //std::cout << "Cerrando posta con KILL" << std::endl; 
         shutdown(this->skt, SHUT_RDWR);
         close(this->skt);
         this->skt = -1;
@@ -75,9 +74,7 @@ void Socket::kill(){
 }
 
 Socket::~Socket() {
-    //std::cout << "Destruyo socket básico: " << std::endl;
     if (this->skt != -1) {
-        //std::cout << "Cerrando posta" << std::endl; 
         shutdown(this->skt, SHUT_RDWR);
         close(this->skt);
     }
@@ -96,34 +93,30 @@ void Socket::connectWithClients(const char* port) {
     s = getaddrinfo(NULL, port, &hints, &results);
 
     if (s != 0) {
-        //trow
-        return;
+        throw std::runtime_error(strerror(s));
     }
 
     int val = 1;
     s = setsockopt(this->skt, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
     if (s == -1) {
-        //trow
-        return;
+        throw std::runtime_error("Error at setsockopt");
     }
 
     ptr = results;
     s = bind(this->skt, ptr->ai_addr, ptr->ai_addrlen);
     if (s == -1) {
-        //trow
-        return;
+        throw std::runtime_error("Error while binding");
     }
     freeaddrinfo(results);
     s = listen(this->skt, MAX_WAITING_CLIENTS);
     if (s == -1) {
-        //trow
-        return;
+        throw std::runtime_error("Error while listening");
     }
     return;
 }
 
 
-bool Socket::connectWithServer(const char* host, const char* port) {
+void Socket::connectWithServer(const char* host, const char* port) {
     struct addrinfo hints;
     struct addrinfo *result, *ptr;
     memset(&hints, 0, sizeof(struct addrinfo));
@@ -143,7 +136,9 @@ bool Socket::connectWithServer(const char* host, const char* port) {
     }
     freeaddrinfo(result);
 
-    return are_we_connected;
+    if (!are_we_connected) {
+        throw std::runtime_error("Error while connecting with client");
+    }
 }
 
 
@@ -180,8 +175,8 @@ int Socket::sendAll(void* buf, size_t size) {
         s = ::send(this->skt, &aux[bytes_sent], \
                 size-bytes_sent, MSG_NOSIGNAL);
         if (s <= 0) {
-            //printf("Error: %s\n", strerror(errno));
-            return -1;
+            std::string error("Error: ");
+            throw std::runtime_error(error + strerror(errno));
         } else {
             bytes_sent += s;
         }
@@ -192,7 +187,13 @@ int Socket::sendAll(void* buf, size_t size) {
 
 Socket Socket::acceptClient(){
     int peerskt = accept(this->skt, NULL, NULL);
+    if (peerskt == -1) {
+        throw std::runtime_error("Error accepting  client");
+    }
     Socket skt(peerskt);
     return std::move(skt);
 }
 
+void Socket::setInvalid() {
+    this->skt = -1;
+}

@@ -5,7 +5,7 @@
 #include <queue>
 #include <istream>
 #include "common_key.h"
-#include "common_my_socket.h"
+#include "common_protocol.h"
 
 class Certificate {
     private:
@@ -17,28 +17,28 @@ class Certificate {
         Key key;
 
     public:
-        Certificate(std::string _subject, std::string _not_before,\
-                     std::string _not_after, Key _key);
+        Certificate(std::string& _subject, std::string& _not_before,\
+                     std::string& _not_after, Key _key);
         Certificate();
         ~Certificate();
         /*
         * Se envian los datos del certificado por el socket.
         */
-        void send(MySocket& skt);
+        void send(Protocol& skt);
         /*
         * Se lee el archivo contenedor del certificado,
         * se envian los datos a traves del socket
         * y se devuelve el valor del certificado hasheado
         */
-        uint32_t send(std::string filename, MySocket& skt);
+        uint32_t send(std::string& filename, Protocol& skt);
         /*
         * Se reciben los datos del certificado por el socket.
         */
-        void receive(MySocket& skt);
+        void receive(Protocol& skt);
         /*
          * Seter del serial number
         */
-        void addSerialNumber(uint32_t serial_number);
+        void addSerial(uint32_t serial_number);
         /*
          * Se imprime el certificado con formato:
          *
