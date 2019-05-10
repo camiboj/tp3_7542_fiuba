@@ -5,6 +5,7 @@ Se leen los comandos de la entrada estándar y se encarga su procesamiento a la 
 
 #### Processor:
 Clase base de la cual heredan los 2 procesadores del programa:
+
 - ***NewProcessor:***
 Por medio de la clase ApplicantRequest envía al Server una solicitud para crear un nuevo certificado.
 Recibe notificación del server indicando si el certificado se creo correctamente o, en caso de error, qué tipo de error ocurrió.
@@ -28,7 +29,6 @@ Se le puede sumar 30 días
 Se puede pasar a string con el formato MMM DD HH:mm:SS YYYY.
 
 ## Server:
----
 Crea el socket.
 Procesa tanto el archivo con los certificados existentes como el archivo que contiene las claves del server.
 Lanza un thread encargado de aceptar y procesar los clientes.
@@ -72,7 +72,7 @@ Recibe un número de 4 bytes y lo encripta en un nuevo número de 4 bytes.
 
 # Esquema del diseño
 
-## Diagrama de clases
+## Diagramas de clases
 
 #### Cliente: 
 ![Build Status](https://github.com/camiboj/tp3_7542_fiuba/blob/master/Informe/client_class.png)
@@ -84,7 +84,7 @@ Principales clases:
 En función de revoke y new:
 ![Build Status](https://github.com/camiboj/tp3_7542_fiuba/blob/master/Informe/server_class2.png)
 
-## Diagrama de secuencia
+## Diagrama de actividad
 Procesar clientes:
 ![Build Status](https://github.com/camiboj/tp3_7542_fiuba/blob/master/Informe/diagrama.png)
 
@@ -162,6 +162,7 @@ Cambios visibles en clase Time (archivo cliente_time.cpp)
 Como se explicó en el punto 4: El protocolo se pasa como referencia a los procesadores del server que lo mueven para almacenarlo como atributo. Por ello, ya no es necesario que el protocolo esté allocado para no morir con el scope.
 
 ## Porque si:
+(cambios que recuerdo haber hecho entre entrega anterior y esta)
 
 - Protocol ahora tiene dos métodos nada mas, pero sobreescritos.
 Antes:
