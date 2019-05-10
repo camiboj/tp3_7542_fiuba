@@ -9,7 +9,9 @@
 #define LEN_SIZE 4
 
 
+
 int main(int argc, char* argv[]) {
+try {
     if (argc != 4) {
         return ERROR_CODE;
     }
@@ -22,12 +24,11 @@ int main(int argc, char* argv[]) {
 
     Socket skt;
     skt.connectWithClients(argv[1]);
-
+    
     std::string index_filename(argv[3]);
     Index index(index_filename);
     
     
-    //skt.acceptClient();
     std::string key_filename = std::string(argv[2]);
     Key key(key_filename);
     Acceptor acceptor(skt, index, key);
@@ -40,9 +41,13 @@ int main(int argc, char* argv[]) {
             break;
         }
     }    
-    acceptor.join();
 
-    
+    acceptor.join();
     index.write();    
+
     return 0;
+    }
+catch(std::runtime_error &e) {
+    std::cerr << e.what() << std::endl;
+}
 }

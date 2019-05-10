@@ -11,7 +11,7 @@ class Socket {
         Socket();
         ~Socket();
 
-        Socket(int skt);
+        explicit Socket(int skt);
         Socket(Socket&& origin); 
         Socket& operator=(Socket&& origin);
         Socket(const Socket& origin);
@@ -19,14 +19,15 @@ class Socket {
         void connectWithClients(const char* port);
         Socket acceptClient();
 
-        bool connectWithServer(const char* host, const char* port);
+        void connectWithServer(const char* host, const char* port);
+        
 
-
-        bool receiveAll(void* buf, size_t len);
+        void receiveAll(void* buf, size_t len);
         int receiveSome(void* buf, size_t size);
         int sendAll(void* buf, size_t size);
 
         void kill();
+        void setInvalid();
 };
 
 

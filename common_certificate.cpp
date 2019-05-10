@@ -16,33 +16,37 @@
 #define KEY "\tsubject public key info:\n"
 #define MODULE "\t\tmodulus: "
 #define EXPONENT "\t\texponent: "
-
 Certificate::Certificate() {}
 
-Certificate::Certificate(std::string _subject, std::string _not_before, \
-                        std::string _not_after, Key _key):
-    subject(_subject),
-    issuer(ISSUER),
-    not_before(_not_before),
-    not_after(_not_after),
+Certificate::Certificate(std::string& _subject, std::string& _not_before, \
+                        std::string& _not_after, Key _key):
     key(_key) {
+            subject = std::move(_subject);
+            issuer = std::string(ISSUER);
+            not_before = std::move(_not_before);
+            not_after = std::move(_not_after);
 }
 
-void Certificate::send(Protocol& skt) {
-    skt.sendNumber(&this->serial_number);
-    skt.sendAll(this->subject);
-    skt.sendAll(this->not_before);
-    skt.sendAll(this->not_after);
-    this->key.send(skt);
+void Certificate::send(Protocol& protocol) {
+    try {
+        protocol.send(this->serial_number);
+        protocol.send(this->subject);
+        protocol.send(this->not_before);
+        protocol.send(this->not_after);
+        this->key.send(protocol);
+    }
+    catch (std::runtime_error) {
+        throw std::runtime_error("Error while sending certificate");
+    }
 }
 
 
-void Certificate::receive(Protocol& skt) {
-    skt.receiveNumber(&this->serial_number);
-    skt.receiveAll(this->subject);
-    skt.receiveAll(this->not_before);
-    skt.receiveAll(this->not_after);
-    this->key.receive(skt);
+void Certificate::receive(Protocol& protocol) {
+    protocol.receive(this->serial_number);
+    protocol.receive(this->subject);
+    protocol.receive(this->not_before);
+    protocol.receive(this->not_after);
+    this->key.receive(protocol);
 }
 
 std::string toHexaString(int n, int len) {
@@ -93,6 +97,69 @@ std::string Certificate::toString() {
     return o;
 }
 
+uint32_t Certificate::send(std::string& filename, Protocol& protocol) {
+    std::ifstream file;
+    file.open(filename);
+    if (!file.good()) {
+        throw std::runtime_error("Error with certificate file");
+    }
+    std::string line;
+    int count = 0;
+    int pos;
+    int len;
+    std::string module;
+    std::string exp;
+    Hash hash;
+    while (std::getline(file, line, '\n')) {
+        if (!file.eof()) {
+            std::string aux = line + '\n';
+            hash.load(aux);
+        } else {
+            hash.load(line);
+        }
+        pos = line.find(':');
+        line = line.c_str();
+        len = line.length();
+        if (pos + 2 > len) { //certificate:\0
+            ++count;
+            continue;
+        }
+        line = line.substr(pos + 2,len);
+        if (count == 1) {
+            len = line.find(' ');
+            uint32_t n = (uint32_t) std::stoi(line.substr(0, len));
+            try {
+                protocol.send(n);
+            }
+            catch (std::runtime_error) {
+                throw std::runtime_error("Error while sending certificate");
+            }
+        } else if ((count == 2) | (count == 5) | (count == 6)) {
+            try { 
+                protocol.send(line);
+            }
+            catch (std::runtime_error) {
+                throw std::runtime_error("Error while sending certificate");
+            }
+        } else if (count == 8) {
+            len = line.find(' ');
+            module = line.substr(0, len);
+        } else if (count == 9) {
+            len = line.find(' ');
+            exp = line.substr(0, len);
+        }        
+        ++count;
+    }
+    Key key(exp, module);
+    try {
+        key.send(protocol);
+    }
+    catch (std::runtime_error) {
+        throw std::runtime_error("Error while sending certificate");
+    }
+    return hash();
+}
+
 std::ostream& operator<<(std::ostream &o, Certificate& self) {
     std::string formal_certificate;
     formal_certificate = self.toString();
@@ -102,6 +169,6 @@ std::ostream& operator<<(std::ostream &o, Certificate& self) {
 
 Certificate::~Certificate() {}
 
-void Certificate::addSerialNumber(uint32_t _serial_number) {
+void Certificate::addSerial(uint32_t _serial_number) {
     this->serial_number = _serial_number;
 }

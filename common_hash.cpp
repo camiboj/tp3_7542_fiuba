@@ -9,7 +9,6 @@ Hash::Hash() {
 Hash::~Hash() {}
 
 Hash::Hash(std::string& str) {
-    //std::cerr << "str recibida en la creacion: " << str << '\n';
     this->count = INITIAL_COUNT;
     this->load(str);
     //std::cerr << "Count luego de creacion: " << this->count << '\n';

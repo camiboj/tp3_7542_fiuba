@@ -17,22 +17,28 @@ class Certificate {
         Key key;
 
     public:
-        Certificate(std::string _subject, std::string _not_before,\
-                     std::string _not_after, Key _key);
+        Certificate(std::string& _subject, std::string& _not_before,\
+                     std::string& _not_after, Key _key);
         Certificate();
         ~Certificate();
         /*
         * Se envian los datos del certificado por el socket.
         */
-        void send(Protocol& skt);
+        void send(Protocol& protocol);
+        /*
+        * Se lee el archivo contenedor del certificado,
+        * se envian los datos a traves del socket
+        * y se devuelve el valor del certificado hasheado
+        */
+        uint32_t send(std::string& filename, Protocol& protocol);
         /*
         * Se reciben los datos del certificado por el socket.
         */
-        void receive(Protocol& skt);
+        void receive(Protocol& protocol);
         /*
          * Seter del serial number
         */
-        void addSerialNumber(uint32_t serial_number);
+        void addSerial(uint32_t serial_number);
         /*
          * Se imprime el certificado con formato:
          *

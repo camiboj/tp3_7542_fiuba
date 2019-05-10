@@ -6,17 +6,17 @@
 #include "common_key.h"
 #include "server_index.h"
 #include "common_protocol.h"
-#include "server_thread.h"
+#include "server_client_processor.h"
 
-class RevokeClientProcessor : public Thread {
+class RevokeClientProcessor : public ClientProcessor {
     private:
-        Protocol* skt;
+        Protocol protocol;
         Index& index;
         Key& server_key;
         bool is_dead;
         
     public:
-        RevokeClientProcessor(Protocol* _skt, Index& _index, Key& _key);
+        RevokeClientProcessor(Protocol& _protocol, Index& _index, Key& _key);
         
         ~RevokeClientProcessor();
         /*  
@@ -34,7 +34,7 @@ class RevokeClientProcessor : public Thread {
          * <dat_to>         String sin ‘\0’
         */
         virtual void run() override;
-        //bool checkCertificate(Socket& skt);
+        //bool checkCertificate(Socket& protocol);
         virtual void stop() override;
         virtual bool isDead() override; 
 };

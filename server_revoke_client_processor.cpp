@@ -1,8 +1,10 @@
+#include <iostream>
+#include <string>
 #include "server_revoke_client_processor.h"
+#include "server_inexisting_certificate.h"
 #include "common_certificate.h"
 #include "common_rsa.h"
 #include "common_hash.h"
-#include <iostream>
 #define HASH_ERROR_MSSG 2
 #define HASH_ERROR 1
 #define INVALID_CERTIFICATE_MSSG 1
@@ -11,53 +13,42 @@
 #define OK_MSSG 0
 
 
-/******************************************************************************
- *comando 1
- *
- * RECIBE:
- *  - Certificado
- *  - Hash
- * 
- * 1- Validar que quien envió esta solicitud de baja sea quien dice ser.
- *      - Lee el subject 
- *          - Si no existe registrado en su mapa un usuario con ese nombre. 
- *              -envia uint8_t 1 y fin.
- *          - Si existe un subject registrado
- *              -continua        
- *      - Desencripta  la  huella  recibida,  primero con la clave  privada del
- *        servidor y  la pública del cliente almacenada en memoria. 
- *      - Compara el hash recibido con el que aplica él al certificado recibido
- *          !=- return ERROR_CODE 2 en formato 1 byte sin signo. 
- *          ==- continuo
- * 2- Elimina al solicitante de su mapa 
- * 3- Responde al cliente con un código 0
-*/
 
-RevokeClientProcessor::RevokeClientProcessor(Protocol* _skt,\
+RevokeClientProcessor::RevokeClientProcessor(Protocol& _protocol,\
                                              Index& _index, Key& _key):
-    skt(_skt),
     index(_index), 
     server_key(_key),
-    is_dead(false) {}
+    is_dead(false) {
+        protocol = std::move(_protocol);
+    }
 
-RevokeClientProcessor::~RevokeClientProcessor() {
-    delete this->skt;
-}
+RevokeClientProcessor::~RevokeClientProcessor() {}
 
 void RevokeClientProcessor::run() {
     Certificate certificate;
-    certificate.receive(*skt);
+    certificate.receive(protocol);
     uint32_t encryption = 0;
-    this->skt->receiveNumber(&encryption);
+    this->protocol.receive(encryption);
     uint8_t answer;
-    if (!this->index.hasCertificate(certificate)) { //ACA!
+    Key client_key = index.find(certificate);
+
+    try {
+        this->index.erase(certificate);
+    }
+    catch(InexistingCertificate) {
         answer = INVALID_CERTIFICATE_MSSG;
-        this->skt->sendNumber(&answer);
+        try {
+            this->protocol.send(answer);
+        }
+        catch(std::runtime_error) {
+            throw std::runtime_error(\
+    "Error, client could not be notified that there was a certificate error");
+        }
         return;
     }
-    Rsa rsa(index.findCertificate(certificate), server_key);
-    uint32_t desencrytion = rsa.privateDesencryption(encryption);
-    uint32_t client_hash = rsa.publicDesencryption(desencrytion);
+    Rsa rsa(client_key, server_key);
+    uint32_t desencryption = rsa.privateDesencryption(encryption);
+    uint32_t client_hash = rsa.publicDesencryption(desencryption);
     std::string formal_certificate = certificate.toString();
     Hash hash(formal_certificate);
     uint32_t my_hash = hash();
@@ -65,12 +56,29 @@ void RevokeClientProcessor::run() {
         //std::cerr << "client hash: " << client_hash << '\n';
         //std::cerr << "my hash: " << my_hash << '\n';
         answer = HASH_ERROR_MSSG;
-        this->skt->sendNumber(&answer);
+        this->index.putBack(certificate, client_key);
+        try {
+            this->index.putBack(certificate, client_key);
+            this->protocol.send(answer);
+        }
+        catch(std::runtime_error) {
+            throw std::runtime_error(\
+      "Error, the client could not be notified  that there was a hash errort");
+        }
+        catch(...) {
+            __throw_exception_again;
+        }
         return;
     }
-    index.eraseCertificate(certificate);
+    //index.erase(certificate);
     answer = OK_MSSG;
-    this->skt->sendNumber(&answer);
+    try {
+        this->protocol.send(answer);
+    }
+    catch(std::runtime_error) {
+        throw std::runtime_error(\
+            "Error, the client could not be notified that there was no error");
+    }
     is_dead = true;
     return;
 }
@@ -81,5 +89,5 @@ bool RevokeClientProcessor::isDead() {
 
 
 void RevokeClientProcessor::stop() {
-    this->skt->stop();
+    this->protocol.stop();
 }

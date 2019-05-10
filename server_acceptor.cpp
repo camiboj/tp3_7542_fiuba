@@ -4,8 +4,9 @@
 #include "server_new_client_processor.h"
 #include "server_revoke_client_processor.h"
 #include "common_key.h"
+#include "server_client_processor.h"
 
-Acceptor::Acceptor(Socket& _skt, Index& _index, Key& _key):  
+Acceptor::Acceptor(Socket& _skt, Index& _index, Key& _key):
     index(_index), 
     key(_key),
     keep_talking(true) {
@@ -13,45 +14,46 @@ Acceptor::Acceptor(Socket& _skt, Index& _index, Key& _key):
     }
         
 void Acceptor::run() {
+try {
     while (this->keep_talking) {
         Socket client_skt;
         try {
             client_skt = this->skt.acceptClient();
         }
-        catch (...) {
-            break;
+        catch (std::runtime_error &e) {
+            std::runtime_error(e.what());
         }
 
-        // std::cout << "Acepte un cliente!" << std::endl;
-        Protocol* protocol = new Protocol(client_skt);
+        Protocol protocol(client_skt);
 
         uint8_t command;
-        protocol->receiveNumber(&command);
+        protocol.receive(command);
         
-        Thread* client;
+        ClientProcessor* client;
         if (command == 0) {
-            client = new NewClientProcessor(protocol, index, key);
+            client = new New(protocol, index, key);
         }
         if (command == 1) {
             client = new RevokeClientProcessor(protocol, index, key);
         }
         this->clients.push_back(client);
         client->start();
-        std::vector<Thread*>::iterator it = this->clients.begin();
-        // std::cout << "Largo clients: " << this->clients.size() << std::endl;
-        for (; it != this->clients.end(); ++it) {
-	        Thread* client = *it;
-            if (client->isDead()) {	
-                // std::cout << "Eliminando threads muertos!" << std::endl;
-                //client->stop();		
+        std::vector<ClientProcessor*>::iterator it = this->clients.begin();
+        while (it != this->clients.end()) {
+	        ClientProcessor* client = *it;
+            if (client->isDead()) {
                 client->join(); 
-	        	delete client;
-	        	this->clients.erase(it);
-	        }
-	    }
-        // std::cout << "Largo clients: " << this->clients.size() << std::endl;
-
+	            delete client;
+	            this->clients.erase(it);
+	        } else {
+                ++it;
+            }
+        }
     }
+}
+catch(std::exception &e) {
+    std::cerr << e.what() << std::endl;
+}
 }
 
 void Acceptor::stop() {
@@ -64,12 +66,9 @@ bool Acceptor::isDead() {
 }
 
 Acceptor::~Acceptor() {
-    // std::cout << "Destruyendo Acceptor!" << std::endl;
-    // std::cout << "Largo clients al destruir: " << this->clients.size() << std::endl;
-    std::vector<Thread*>::iterator it = this->clients.begin();
+    std::vector<ClientProcessor*>::iterator it = this->clients.begin();
     for (; it != this->clients.end(); ++it) {
-        // std::cout << "Quedaron threads!" << std::endl;
-	    Thread* client = *it;
+	    ClientProcessor* client = *it;
             client->join(); 
 	    	delete client;
     }

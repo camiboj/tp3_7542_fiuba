@@ -7,6 +7,7 @@
 #include "common_certificate.h"
 #include "common_hash.h"
 #include "common_rsa.h"
+#include "client_invalid_request.h"
 #define USER_ERROR_MSSG "Error: usuario no registrado.\n"
 #define USER_ERROR 0
 #define CERTIFICATE_ERROR_MSSG "Error: ya existe un certificado.\n"
@@ -20,8 +21,7 @@
 #define MH "Hash calculado: "
 
 
-NewProcessor::NewProcessor(Protocol& _skt) : 
-skt(_skt) {}
+NewProcessor::NewProcessor(Protocol& _protocol) : Processor(_protocol) {}
 
 NewProcessor::~NewProcessor() {}
 
@@ -30,16 +30,20 @@ void NewProcessor::run(std::string& certificate_information_filename, \
                         std::string& server_key_filename) {
     ApplicantRequest request(certificate_information_filename,\
                                 client_key_filename);
-    request.send(skt);
+    try {
+        request.send(protocol);
+    }
+    catch (std::runtime_error) {
+        __throw_exception_again;
+    }
     uint8_t answer = 1;
-    skt.receiveNumber(&answer);
+    protocol.receive(answer);
     if (answer == CERIFICATE_ERROR_RECIVED_MSSG) {
-        std::cout << CERTIFICATE_ERROR_MSSG;
-        return;
+        throw InvalidRequest(CERTIFICATE_ERROR_MSSG);
     }
 
     Certificate certificate;
-    certificate.receive(skt);
+    certificate.receive(protocol);
     std::string formal_certificate;
     formal_certificate = certificate.toString();
 
@@ -48,14 +52,17 @@ void NewProcessor::run(std::string& certificate_information_filename, \
     uint32_t my_hash =  hash();
 
 
-    //uint32_t server_hash = 0;
-    //skt.receiveNumber(&server_hash);
-
     uint32_t certificate_footprint = 0;
-    skt.receiveNumber(&certificate_footprint);
+    protocol.receive(certificate_footprint);
+
     Key client_key = request.getClientKey();
     Key server_key;
-    server_key.set(server_key_filename);
+    try {
+        server_key.set(server_key_filename);
+    }
+    catch(std::runtime_error) {
+        throw std::runtime_error("Error seting server key");
+    }
     Rsa rsa(server_key, client_key);
     uint32_t pd =  rsa.privateDesencryption(certificate_footprint);
     uint32_t server_hash = rsa.publicDesencryption(pd);
@@ -63,15 +70,28 @@ void NewProcessor::run(std::string& certificate_information_filename, \
     std::cout << CERT_FP << certificate_footprint << '\n';
     std::cout << SH << server_hash << '\n';
     std::cout << MH << my_hash << '\n';
-    
+
     uint8_t notification = HASH_OK_SERVER_MSSG;
     if (my_hash != server_hash) {
         notification = HASH_ERROR_SERVER_MSSG;
-        skt.sendNumber(&notification);
-        std::cout << HASH_ERROR_MSSG;
-        return;
+        try {
+            protocol.send(notification);
+        }
+        catch(std::runtime_error) {
+            throw std::runtime_error(\
+            "Error , the server could not be notified there was a hash error");
+        }
+        
+        throw InvalidRequest(HASH_ERROR_MSSG);
     }
-    skt.sendNumber(&notification);
+
+    try {
+        protocol.send(notification);
+    }
+    catch(std::runtime_error) {
+        throw std::runtime_error(\
+        "Error , the server could not be notified there was no hash error");
+    }
 
     std::string filename = request.getSubject() + ".cert";
     std::ofstream file;

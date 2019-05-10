@@ -1,17 +1,19 @@
 #ifndef CLIENT_REVOKE_PROCESSOR_H
 #define CLIENT_REVOKE_PROCESSOR_H
 #include "common_protocol.h"
+#include "client_processor.h"
 #include <string>
 
-class RevokeProcessor {
+class RevokeProcessor : Processor{
     private:
-        Protocol& skt;
+        //Protocol& protocol;
 
     public:
-        explicit RevokeProcessor(Protocol& skt);
+        explicit RevokeProcessor(Protocol& _protocol);
         ~RevokeProcessor();
-        void run(std::string& certificate_filename, \
-             std::string& client_key_filname, std::string& server_key_filename);
+        virtual void run(std::string& certificate_filename, \
+             std::string& client_key_filename, \
+             std::string& server_key_filename) override;
 };
 
 #endif

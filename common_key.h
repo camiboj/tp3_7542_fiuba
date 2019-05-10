@@ -32,8 +32,8 @@ class Key {
          * Módulo: en formato 2 bytes en big endian sin signo.
          * Exponente: en 1 byte.
         */
-        void send(Protocol& skt);
-        void receive(Protocol& skt);
+        void send(Protocol& protocol);
+        void receive(Protocol& protocol);
         friend std::ostream& operator<<(std::ostream&, const Key&);
         /*
          * Recibe un string y una función que al pasarle el exponente publico y

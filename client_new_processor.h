@@ -2,16 +2,17 @@
 #define CLIENT_NEW_PROCESSOR_H
 #include <string>
 #include "common_protocol.h"
+#include "client_processor.h"
 
-class NewProcessor {
+class NewProcessor : Processor{
     private:
-        Protocol& skt;
+//        Protocol& protocol;
     public:
-        explicit NewProcessor(Protocol& skt);
+        explicit NewProcessor(Protocol& protocol);
         ~NewProcessor();
-        void run(std::string& certificate_information_filename, \
+        virtual void run(std::string& certificate_information_filename, \
                         std::string& client_key_filename, \
-                        std::string& server_key_filename);
+                        std::string& server_key_filename) override;
 };
 
 #endif
