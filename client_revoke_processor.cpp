@@ -12,23 +12,48 @@
 #define PRIVATE_ENCRYPTION "Hash encriptado con la clave privada: "
 #define PUBLIC_ENCRYPTION "Huella enviada: "
 
-RevokeProcessor::RevokeProcessor(Protocol& _skt) : skt(_skt) {}
+RevokeProcessor::RevokeProcessor(Protocol& _protocol) : Processor(_protocol) {}
 RevokeProcessor::~RevokeProcessor() {}
 
 void RevokeProcessor::run(std::string& certificate_filename,\
          std::string& client_key_filename, std::string& server_key_filename) {
     uint8_t command = 1;
-    this->skt.send(command);
+    try {
+        this->protocol.send(command);
+    }
+    catch (std::runtime_error) {
+        throw std::runtime_error("Error while sending command new");
+    }
+    
     Certificate certificate;
-    uint32_t hash = certificate.send(certificate_filename, skt);
-    Key server_key(server_key_filename);
-    Key client_key(client_key_filename);
-    Rsa rsa(server_key, client_key);
+    Rsa rsa;
+    try {
+        Key server_key(server_key_filename);
+        Key client_key(client_key_filename);
+        rsa.set(server_key, client_key);
+    }
+    catch(...) {
+        throw std::runtime_error("Error creating key");
+    }
+    uint32_t hash;
+
+    try {
+        hash = certificate.send(certificate_filename, protocol);
+    }
+    catch(...) {
+        __throw_exception_again;
+    }
+
     uint32_t priv_encryption = rsa.privateEncryption(hash);
     uint32_t publ_encryption = rsa.publicEncryption(priv_encryption);
-    this->skt.send(publ_encryption);
+    try {
+        this->protocol.send(publ_encryption);
+    }
+    catch (std::runtime_error) {
+        throw std::runtime_error("Error while sending encrypted hash");
+    }
     uint8_t status = 0;
-    this->skt.receive(status);
+    this->protocol.receive(status);
     
     std::cout << HASH << (int) hash << '\n';
     std::cout << PRIVATE_ENCRYPTION << (int) priv_encryption << '\n';

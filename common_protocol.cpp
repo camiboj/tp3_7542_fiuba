@@ -64,7 +64,7 @@ int Protocol::receive(std::string& str) {
     char c;
     int received = 0;
     for (size_t i = 0; i < len; ++i){
-        received = this->skt.receiveSome(&c, 1);
+        received += this->skt.receiveSome(&c, 1);
         str.append(1, c);
     }
     return received;

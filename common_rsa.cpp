@@ -9,6 +9,15 @@ Rsa::Rsa(Key& public_key, Key& private_key) {
     this->private_module = private_key.getModule();
 }
 
+Rsa::Rsa(){}
+
+void Rsa::set(Key& public_key, Key& private_key) {
+    this->public_exponent = public_key.getPublicExponent();
+    this->public_module = public_key.getModule();
+    this->private_exponent = private_key.getPrivateExponent();
+    this->private_module = private_key.getModule();
+}
+
 Rsa::~Rsa() {}
 
 uint32_t encrypt(const uint32_t exponent, const uint32_t module,\

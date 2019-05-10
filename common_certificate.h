@@ -24,17 +24,17 @@ class Certificate {
         /*
         * Se envian los datos del certificado por el socket.
         */
-        void send(Protocol& skt);
+        void send(Protocol& protocol);
         /*
         * Se lee el archivo contenedor del certificado,
         * se envian los datos a traves del socket
         * y se devuelve el valor del certificado hasheado
         */
-        uint32_t send(std::string& filename, Protocol& skt);
+        uint32_t send(std::string& filename, Protocol& protocol);
         /*
         * Se reciben los datos del certificado por el socket.
         */
-        void receive(Protocol& skt);
+        void receive(Protocol& protocol);
         /*
          * Seter del serial number
         */

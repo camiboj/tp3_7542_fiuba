@@ -13,7 +13,8 @@
 
 class CertificateInfoParser {
     public:
-        CertificateInfoParser(std::string& filename, std::string& subject,\
+        CertificateInfoParser();
+        void run(std::string& filename, std::string& subject,\
                              std::string& from, std::string& to);
         ~CertificateInfoParser();
 };

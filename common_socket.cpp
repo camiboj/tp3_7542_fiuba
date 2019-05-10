@@ -19,6 +19,15 @@
 
 #define MAX_WAITING_CLIENTS 20
 
+/******************************************************************************
+ * TODOS LOS 
+ * if (s < 0) {
+ *    return 
+ * }
+ * TIENEN QUE SER EXCEPCIONES EN UN FUTURO.
+*/
+
+
 
 Socket::Socket() {
     int familia_skt = AF_INET;      /* IPv4 (or AF_INET6 for IPv6)     */
@@ -137,22 +146,19 @@ void Socket::receiveAll(void* buf, size_t len) {
     memset(buf, 0, len);
     size_t received = 0;
     int status = 0;
-    bool is_there_an_error = false;
+    bool keep_going = true;
     char* aux = (char*) buf;
-    while (received < len && !is_there_an_error) {
+    while (received < len && keep_going) {
         status = this->receiveSome(&aux[received], len - received);
-        if (status == 0) { 
-            is_there_an_error = true;
-        } else if (status < 0) { 
-            is_there_an_error = true;
+        //if (status == 0) {
+        //    keep_going = true;
+        //} else 
+        if (status < 0) {
+            keep_going = false;
         } else {
             received += status;
         }
-    }
-    if (is_there_an_error) {
-        std::string error("Error: ");
-        throw std::runtime_error(error + strerror(errno));    
-    }
+    }    
 }
 
 int Socket::receiveSome(void* buf, size_t size) {

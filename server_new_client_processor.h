@@ -2,14 +2,14 @@
 #define SERVER_NEW_CLIENT_PROCESSOR_H
 #include <stdint.h>
 #include <string>
-#include "server_thread.h"
+#include "server_client_processor.h"
 #include "common_socket.h"
 #include "common_key.h"
 #include "server_index.h"
 
-class NewClientProcessor: public Thread {
+class New: public ClientProcessor {
     private:
-        Protocol skt;
+        Protocol protocol;
         Index& index;
         Key& server_key;
         std::string subject;
@@ -26,9 +26,9 @@ class NewClientProcessor: public Thread {
         /*
         * Recibe los dos archivos necesarios para solicitar un nuevo aplicante
         */
-        NewClientProcessor(Protocol& skt, Index& _index, Key& key);
+        New(Protocol& protocol, Index& _index, Key& key);
         
-        ~NewClientProcessor();
+        ~New();
         /*  
          * Envia a traves del socket recibido por parametro una solucitud con
          * formato:

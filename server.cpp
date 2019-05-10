@@ -23,9 +23,7 @@ try {
     }
 
     Socket skt;
-    
-        skt.connectWithClients(argv[1]);
-    
+    skt.connectWithClients(argv[1]);
     
     std::string index_filename(argv[3]);
     Index index(index_filename);
@@ -43,10 +41,10 @@ try {
             break;
         }
     }    
-    acceptor.join();
 
-    
+    acceptor.join();
     index.write();    
+
     return 0;
     }
 catch(std::runtime_error &e) {

@@ -14,19 +14,36 @@ class Index {
         std::mutex mutex;
         uint32_t serial_number;
 
-    public:
-        //Index();
-        void write();
-        void saveCertificate(Certificate& certificate);
         
-        bool hasCertificate(std::string& str);
-        bool hasCertificate(Certificate& certificate);
-        Key findCertificate(Certificate& cartificate);
-        void eraseCertificate(Certificate& certificate);
-        void eraseCertificate(std::string& str);
+
+    public:
+        Index();
+        void write();
+        void save(Certificate& certificate);
+        //void increaseSerialNumber();
+
+        /*
+        * Vuelve a almacenar el certificado pasado por parametro.
+        * Con client_key valor.
+        */
+        void putBack(Certificate& certificate,  Key& client_key);
+        
+        
+        Key find(Certificate& cartificate);
+
+        /* Borra el certificado
+        *  Si el certificado no existe lanza una exepcion de tipo
+        *  InexistentCertificate
+        */
+        void erase(Certificate& certificate);
+        void erase(std::string& str);
 
         explicit Index(std::string& filename);
         ~Index();
+
+
+        bool has(std::string& str);
+        bool has(Certificate& certificate);
 };
 
 #endif

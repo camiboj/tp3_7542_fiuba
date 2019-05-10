@@ -1,6 +1,8 @@
 #include <string>
 #include <iostream>
 #include "server_new_client_processor.h"
+#include "server_inexisting_certificate.h"
+#include "server_existing_certificate.h"
 #include "common_certificate.h"
 #include "common_hash.h"
 #include "common_rsa.h"
@@ -12,49 +14,67 @@
 #define ERROR_CODE 1
 #define HASH_STATUS_SIZE 1
 
-NewClientProcessor::NewClientProcessor(Protocol& _skt, \
+New::New(Protocol& _protocol, \
                                         Index& _index, Key& _key) :
     index(_index), 
     server_key(_key),
     is_dead(false) {
-        this->skt = std::move(_skt);
+        this->protocol = std::move(_protocol);
     }
 
-NewClientProcessor::~NewClientProcessor() {}
+New::~New() {}
 
-void NewClientProcessor::receiveInfo() {
-    skt.receive(this->subject);
-    this->client_key.receive(skt);
+void New::receiveInfo() {
+    protocol.receive(this->subject);
+    this->client_key.receive(protocol);
     
-    skt.receive(this->date_from);
+    protocol.receive(this->date_from);
 
-    skt.receive(this->date_to);
+    protocol.receive(this->date_to);
     if (subject.size() == 0) {
         throw std::runtime_error("");
     }
 }
 
-std::string NewClientProcessor::createCertificate() {
+std::string New::createCertificate() {
     std::string subj = this->subject;
     Certificate certificate(subj, this->date_from, this->date_to,\
              this->client_key);
-    this->index.saveCertificate(certificate);
+
+    uint8_t answer = CERTIFICATE_OK;
+    try {
+        this->index.save(certificate);
+    }
+    catch(ExistingCertificate) { //ExistingCertificate
+        answer = CERTIFICATE_ERROR;
+        try {
+            protocol.send(answer);
+        }
+        catch(std::runtime_error) {
+            throw std::runtime_error(
+     "Error, client could not be notified that there was a certificate error");
+        }
+        __throw_exception_again;
+    }
+    try {
+        protocol.send(answer);
+    }
+    catch(std::runtime_error) {
+        throw std::runtime_error(\
+        "Error, the client could not be notified that there was no error");
+    }
+
     std::string result = certificate.toString();
-    certificate.send(skt);
+    try {
+        certificate.send(protocol);
+    }
+    catch(std::runtime_error) {
+        throw std::runtime_error(\
+        "Error sending the certificate while processing new client");
+    }
     return result;
 }
 
-bool NewClientProcessor::checkCertificate() {
-    uint8_t answer = CERTIFICATE_OK;
-    if (index.hasCertificate(this->subject)) {
-        answer = CERTIFICATE_ERROR;
-        skt.send(answer);
-        //trow algo;
-        return false;
-    } 
-    skt.send(answer);
-    return true;
-}
 
 uint32_t encrypt(Key client_key, Key server_key, uint32_t hash) {
     Rsa rsa(client_key, server_key);
@@ -63,7 +83,7 @@ uint32_t encrypt(Key client_key, Key server_key, uint32_t hash) {
     return encryption;
 }
 
-void NewClientProcessor::run() {
+void New::run() {
     try {
         this->receiveInfo();
     }
@@ -71,31 +91,45 @@ void NewClientProcessor::run() {
         this->is_dead = true;
         return;
     }
-    bool s = this->checkCertificate();
-    if (!s) return;
-    std::string formal_certificate = this->createCertificate();
+
+
+    std::string formal_certificate;
+    try {
+        formal_certificate = this->createCertificate();
+    } catch(ExistingCertificate) {
+        return;
+    }
+    
     
     Hash hash(formal_certificate);
     uint32_t hashed_certificate =  hash();
     uint32_t encryption = encrypt(this->client_key, this->server_key,\
                                  hashed_certificate);
-
-    skt.send(encryption);
-    
-    uint8_t hash_status = 0;
-    skt.receive(hash_status);
-    if (hash_status == HASH_ERROR) {
-        index.eraseCertificate(this->subject);
+    try {
+        protocol.send(encryption);
     }
-    
+    catch(std::runtime_error) {
+        throw std::runtime_error(\
+        "Error sending encrypted hash while processing new client");
+    }
+    uint8_t hash_status = 0;
+    protocol.receive(hash_status);
+    if (hash_status == HASH_ERROR) {
+        try {
+            index.erase(this->subject);
+        }
+        catch(InexistingCertificate){
+            throw std::runtime_error("Error erasing certificate");
+        }
+    }
     this->is_dead = true;
     return;
 }
 
-bool NewClientProcessor::isDead() {
+bool New::isDead() {
     return this->is_dead;
 }
 
-void NewClientProcessor::stop() {
-    this->skt.stop();
+void New::stop() {
+    this->protocol.stop();
 }

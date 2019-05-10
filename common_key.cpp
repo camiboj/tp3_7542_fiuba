@@ -12,15 +12,19 @@
 
 
 Key::Key(std::string& _public_exponent, std::string& _module) {
-    this->public_exponent = (uint8_t) atoi(_public_exponent.c_str());
-    this->module = (uint8_t) atoi(_module.c_str());
+    this->set(_public_exponent, _module);
 }
 
 Key::Key() {}
 
 void Key::set(std::string& _public_exponent, std::string& _module){
-    this->public_exponent = (uint8_t) atoi(_public_exponent.c_str());
-    this->module = (uint8_t) atoi(_module.c_str());
+    int aux;
+    std::istringstream pe(_public_exponent);
+    pe >> aux;
+    this->public_exponent = (uint8_t) aux;
+    std::istringstream m(_module);
+    m >> aux;
+    this->module = (uint16_t) aux;
 }
 
 Key::Key(std::string& filename) {
@@ -30,16 +34,26 @@ Key::Key(std::string& filename) {
 void Key::set(std::string& filename) {
     std::ifstream file;
     file.open(filename); 
+    if (!file.good()) {
+        throw std::runtime_error("Error with file while seting key");
+    }
     std::string line;
     int i = 0;
+    int aux;
     while (std::getline(file, line, ' ')) {
         if (line.length() == 0) continue;
         if (i == PUBLIC_EXP_POS) {
-            this->public_exponent = (uint8_t) atoi(line.c_str());
+            std::istringstream pbe(line);
+            pbe >> aux;
+            this->public_exponent = (uint8_t) aux;
         } else if (i == PRIVATE_EXP_POS) {
-            this->private_exponent = (uint8_t) atoi(line.c_str());
+            std::istringstream pre(line);
+            pre >> aux;
+            this->private_exponent = (uint8_t) aux;
         } else if (i == MODULE_POS) {
-            this->module = (uint16_t) atoi(line.c_str());
+                std::istringstream m(line);
+                m >> aux;
+                this->module = (uint16_t) aux;
         }
         i++;
     }
@@ -57,14 +71,19 @@ Key::Key(const Key &key) {
 
 Key::~Key() {}
 
-void Key::receive(Protocol& skt) {
-    skt.receive(this->public_exponent);
-    skt.receive(this->module);
+void Key::receive(Protocol& protocol) {
+    protocol.receive(this->public_exponent);
+    protocol.receive(this->module);
 }
 
-void Key::send(Protocol& skt) {
-    skt.send(this->public_exponent);
-    skt.send(this->module);
+void Key::send(Protocol& protocol) {
+    try {
+        protocol.send(this->public_exponent);
+        protocol.send(this->module);
+    }
+    catch(std::runtime_error) {
+        throw std::runtime_error("Error while sending key");
+    }
 }
 
 std::ostream& operator<<(std::ostream& o, const Key& self) {

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "server_revoke_client_processor.h"
+#include "server_inexisting_certificate.h"
 #include "common_certificate.h"
 #include "common_rsa.h"
 #include "common_hash.h"
@@ -13,29 +14,38 @@
 
 
 
-RevokeClientProcessor::RevokeClientProcessor(Protocol& _skt,\
+RevokeClientProcessor::RevokeClientProcessor(Protocol& _protocol,\
                                              Index& _index, Key& _key):
     index(_index), 
     server_key(_key),
     is_dead(false) {
-        skt = std::move(_skt);
+        protocol = std::move(_protocol);
     }
 
 RevokeClientProcessor::~RevokeClientProcessor() {}
 
 void RevokeClientProcessor::run() {
     Certificate certificate;
-    certificate.receive(skt);
+    certificate.receive(protocol);
     uint32_t encryption = 0;
-    this->skt.receive(encryption);
+    this->protocol.receive(encryption);
     uint8_t answer;
-    // race condition ->
-    if (!this->index.hasCertificate(certificate)) { //ACA!
+    Key client_key = index.find(certificate);
+
+    try {
+        this->index.erase(certificate);
+    }
+    catch(InexistingCertificate) {
         answer = INVALID_CERTIFICATE_MSSG;
-        this->skt.send(answer);
+        try {
+            this->protocol.send(answer);
+        }
+        catch(std::runtime_error) {
+            throw std::runtime_error(\
+    "Error, client could not be notified that there was a certificate error");
+        }
         return;
     }
-    Key client_key = index.findCertificate(certificate);
     Rsa rsa(client_key, server_key);
     uint32_t desencryption = rsa.privateDesencryption(encryption);
     uint32_t client_hash = rsa.publicDesencryption(desencryption);
@@ -44,12 +54,29 @@ void RevokeClientProcessor::run() {
     uint32_t my_hash = hash();
     if (my_hash != client_hash) {
         answer = HASH_ERROR_MSSG;
-        this->skt.send(answer);
+        this->index.putBack(certificate, client_key);
+        try {
+            this->index.putBack(certificate, client_key);
+            this->protocol.send(answer);
+        }
+        catch(std::runtime_error) {
+            throw std::runtime_error(\
+      "Error, the client could not be notified  that there was a hash errort");
+        }
+        catch(...) {
+            __throw_exception_again;
+        }
         return;
     }
-    index.eraseCertificate(certificate);
+    //index.erase(certificate);
     answer = OK_MSSG;
-    this->skt.send(answer);
+    try {
+        this->protocol.send(answer);
+    }
+    catch(std::runtime_error) {
+        throw std::runtime_error(\
+            "Error, the client could not be notified that there was no error");
+    }
     is_dead = true;
     return;
 }
@@ -60,5 +87,5 @@ bool RevokeClientProcessor::isDead() {
 
 
 void RevokeClientProcessor::stop() {
-    this->skt.stop();
+    this->protocol.stop();
 }

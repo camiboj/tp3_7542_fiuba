@@ -27,21 +27,26 @@ Certificate::Certificate(std::string& _subject, std::string& _not_before, \
             not_after = std::move(_not_after);
 }
 
-void Certificate::send(Protocol& skt) {
-    skt.send(this->serial_number);
-    skt.send(this->subject);
-    skt.send(this->not_before);
-    skt.send(this->not_after);
-    this->key.send(skt);
+void Certificate::send(Protocol& protocol) {
+    try {
+        protocol.send(this->serial_number);
+        protocol.send(this->subject);
+        protocol.send(this->not_before);
+        protocol.send(this->not_after);
+        this->key.send(protocol);
+    }
+    catch (std::runtime_error) {
+        throw std::runtime_error("Error while sending certificate");
+    }
 }
 
 
-void Certificate::receive(Protocol& skt) {
-    skt.receive(this->serial_number);
-    skt.receive(this->subject);
-    skt.receive(this->not_before);
-    skt.receive(this->not_after);
-    this->key.receive(skt);
+void Certificate::receive(Protocol& protocol) {
+    protocol.receive(this->serial_number);
+    protocol.receive(this->subject);
+    protocol.receive(this->not_before);
+    protocol.receive(this->not_after);
+    this->key.receive(protocol);
 }
 
 std::string toHexaString(int n, int len) {
@@ -92,9 +97,12 @@ std::string Certificate::toString() {
     return o;
 }
 
-uint32_t Certificate::send(std::string& filename, Protocol& skt) {
+uint32_t Certificate::send(std::string& filename, Protocol& protocol) {
     std::ifstream file;
     file.open(filename);
+    if (!file.good()) {
+        throw std::runtime_error("Error with certificate file");
+    }
     std::string line;
     int count = 0;
     int pos;
@@ -109,7 +117,6 @@ uint32_t Certificate::send(std::string& filename, Protocol& skt) {
         } else {
             hash.load(line);
         }
-        //// std::cout << "Line: " << line << '\n';
         pos = line.find(':');
         line = line.c_str();
         len = line.length();
@@ -121,9 +128,19 @@ uint32_t Certificate::send(std::string& filename, Protocol& skt) {
         if (count == 1) {
             len = line.find(' ');
             uint32_t n = (uint32_t) std::stoi(line.substr(0, len));
-            skt.send(n);
+            try {
+                protocol.send(n);
+            }
+            catch (std::runtime_error) {
+                throw std::runtime_error("Error while sending certificate");
+            }
         } else if ((count == 2) | (count == 5) | (count == 6)) {
-            skt.send(line);
+            try { 
+                protocol.send(line);
+            }
+            catch (std::runtime_error) {
+                throw std::runtime_error("Error while sending certificate");
+            }
         } else if (count == 8) {
             len = line.find(' ');
             module = line.substr(0, len);
@@ -134,7 +151,12 @@ uint32_t Certificate::send(std::string& filename, Protocol& skt) {
         ++count;
     }
     Key key(exp, module);
-    key.send(skt);
+    try {
+        key.send(protocol);
+    }
+    catch (std::runtime_error) {
+        throw std::runtime_error("Error while sending certificate");
+    }
     return hash();
 }
 

@@ -21,8 +21,7 @@
 #define MH "Hash calculado: "
 
 
-NewProcessor::NewProcessor(Protocol& _skt) : 
-skt(_skt) {}
+NewProcessor::NewProcessor(Protocol& _protocol) : Processor(_protocol) {}
 
 NewProcessor::~NewProcessor() {}
 
@@ -31,15 +30,20 @@ void NewProcessor::run(std::string& certificate_information_filename, \
                         std::string& server_key_filename) {
     ApplicantRequest request(certificate_information_filename,\
                                 client_key_filename);
-    request.send(skt);
+    try {
+        request.send(protocol);
+    }
+    catch (std::runtime_error) {
+        __throw_exception_again;
+    }
     uint8_t answer = 1;
-    skt.receive(answer);
+    protocol.receive(answer);
     if (answer == CERIFICATE_ERROR_RECIVED_MSSG) {
         throw InvalidRequest(CERTIFICATE_ERROR_MSSG);
     }
 
     Certificate certificate;
-    certificate.receive(skt);
+    certificate.receive(protocol);
     std::string formal_certificate;
     formal_certificate = certificate.toString();
 
@@ -48,15 +52,17 @@ void NewProcessor::run(std::string& certificate_information_filename, \
     uint32_t my_hash =  hash();
 
 
-    //uint32_t server_hash = 0;
-    //skt.receive(server_hash);
-
     uint32_t certificate_footprint = 0;
-    skt.receive(certificate_footprint);
+    protocol.receive(certificate_footprint);
 
     Key client_key = request.getClientKey();
     Key server_key;
-    server_key.set(server_key_filename);
+    try {
+        server_key.set(server_key_filename);
+    }
+    catch(std::runtime_error) {
+        throw std::runtime_error("Error seting server key");
+    }
     Rsa rsa(server_key, client_key);
     uint32_t pd =  rsa.privateDesencryption(certificate_footprint);
     uint32_t server_hash = rsa.publicDesencryption(pd);
@@ -68,10 +74,24 @@ void NewProcessor::run(std::string& certificate_information_filename, \
     uint8_t notification = HASH_OK_SERVER_MSSG;
     if (my_hash != server_hash) {
         notification = HASH_ERROR_SERVER_MSSG;
-        skt.send(notification);
+        try {
+            protocol.send(notification);
+        }
+        catch(std::runtime_error) {
+            throw std::runtime_error(\
+            "Error , the server could not be notified there was a hash error");
+        }
+        
         throw InvalidRequest(HASH_ERROR_MSSG);
     }
-    skt.send(notification);
+
+    try {
+        protocol.send(notification);
+    }
+    catch(std::runtime_error) {
+        throw std::runtime_error(\
+        "Error , the server could not be notified there was no hash error");
+    }
 
     std::string filename = request.getSubject() + ".cert";
     std::ofstream file;

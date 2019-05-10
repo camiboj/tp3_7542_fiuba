@@ -3,13 +3,16 @@
 #include <iostream>
 #include <string>
 #include "client_certificate_info_parser.h"
-#include "common_time.h"
+#include "client_time.h"
 
-CertificateInfoParser::CertificateInfoParser(std::string& filename, \
+void CertificateInfoParser::run(std::string& filename, \
                                 std::string& subject, std::string& from,\
                                 std::string& to) {
     std::ifstream file;
-    file.open(filename); 
+    file.open(filename);
+    if (!file.good()) {
+        throw std::runtime_error("Error with file while parsing certificate");
+    }
     std::string line;
     int i = 0;
     while (std::getline(file, line, '\n')) {
@@ -30,4 +33,5 @@ CertificateInfoParser::CertificateInfoParser(std::string& filename, \
     }
 }
 
+CertificateInfoParser::CertificateInfoParser() {}
 CertificateInfoParser::~CertificateInfoParser() {}

@@ -9,6 +9,7 @@
 #include "server_thread.h"
 #include "common_socket.h"
 #include "server_index.h"
+#include "server_client_processor.h"
 //#include "compare_bf.h"
 
 
@@ -20,7 +21,7 @@ class Acceptor : public Thread {
         Key& key;
         Socket client_skt;
         bool keep_talking;
-        std::vector<Thread*> clients;
+        std::vector<ClientProcessor*> clients;
 
     public:
         Acceptor(Socket& _skt, Index& index, Key& key);

@@ -34,7 +34,7 @@ class ApplicantRequest {
          * <date__size>     4 bytes big endian sin signo
          * <dat_to>         String sin ‘\0’
         */
-        void send(Protocol& skt);
+        void send(Protocol& protocol);
         Key getClientKey();
         std::string getSubject();
 };

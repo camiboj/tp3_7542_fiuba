@@ -38,6 +38,7 @@ try {
     std::string client_key_filename = std::string(argv[5]);
     std::string server_key_filename = std::string(argv[6]);
     
+
     if (mode == mode1) {
         std::string certificate_information_filename(argv[4]);
         NewProcessor np(protocol);
