@@ -75,18 +75,18 @@ Recibe un número de 4 bytes y lo encripta en un nuevo número de 4 bytes.
 ## Diagrama de clases
 
 #### Cliente: 
-![Build Status](client_class.png)
+![Build Status](https://github.com/camiboj/tp3_7542_fiuba/blob/master/Informe/client_class.png)
 
 #### Server:
 Principales clases:
-![Build Status](server_class1.png)
+![Build Status](https://github.com/camiboj/tp3_7542_fiuba/blob/master/Informe/server_class1.png)
 
 En función de revoke y new:
-![Build Status](server_class2.png)
+![Build Status](https://github.com/camiboj/tp3_7542_fiuba/blob/master/Informe/server_class2.png)
 
 ## Diagrama de secuencia
 Procesar clientes:
-![Build Status](diagrama.png)
+![Build Status](https://github.com/camiboj/tp3_7542_fiuba/blob/master/Informe/diagrama.png)
 
 
 # Correcciones
