@@ -1,5 +1,5 @@
-#ifndef COMMON_MY_SOCKET_H
-#define COMMON_MY_SOCKET_H
+#ifndef COMMON_PROTOCOL_H
+#define COMMON_PROTOCOL_H
 #include "common_socket.h"
 #include <string>
 
@@ -11,19 +11,21 @@ class Protocol {
         Socket skt;
 
     public:
+        Protocol();
         explicit Protocol(Socket& _skt);
         ~Protocol();
+        Protocol(Protocol&& origin); 
+        Protocol& operator=(Protocol&& origin);
+        void receive(uint8_t& n);
+        void receive(uint16_t& n);
+        void receive(uint32_t& n);
 
-        void receiveNumber(uint8_t* n);
-        void receiveNumber(uint16_t* n);
-        void receiveNumber(uint32_t* n);
+        void send(uint8_t& n);
+        void send(uint16_t& n);
+        void send(uint32_t& n);
 
-        void sendNumber(uint8_t* n);
-        void sendNumber(uint16_t* n);
-        void sendNumber(uint32_t* n);
-
-        int sendAll(std::string& str);
-        int receiveAll(std::string& str);
+        int send(std::string& str);
+        int receive(std::string& str);
         void stop();
 };
 

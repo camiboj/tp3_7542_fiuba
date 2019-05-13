@@ -57,6 +57,7 @@ class Certificate {
         std::string getSubject();
         Key getKey();
         friend std::ostream& operator<<(std::ostream &o, Certificate& self);
+        //friend std::istream& operator>> (std::istream &in, Certificate& self);
 };
 
 #endif

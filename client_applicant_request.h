@@ -37,7 +37,6 @@ class ApplicantRequest {
         void send(Protocol& protocol);
         Key getClientKey();
         std::string getSubject();
-        Key getClientKey();
 };
 
 #endif

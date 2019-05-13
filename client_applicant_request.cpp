@@ -36,7 +36,7 @@ void ApplicantRequest::send(Protocol& protocol) {
     }
 }
 
-std::string ApplicantRequest::getSubject() {
+std::string ApplicantRequest::getSubject(){
     return this->subject;
 }
 

@@ -11,7 +11,6 @@ Hash::~Hash() {}
 Hash::Hash(std::string& str) {
     this->count = INITIAL_COUNT;
     this->load(str);
-    //std::cerr << "Count luego de creacion: " << this->count << '\n';
 }
 
 void Hash::load(std::string& str) {

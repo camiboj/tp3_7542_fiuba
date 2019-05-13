@@ -53,8 +53,6 @@ void RevokeClientProcessor::run() {
     Hash hash(formal_certificate);
     uint32_t my_hash = hash();
     if (my_hash != client_hash) {
-        //std::cerr << "client hash: " << client_hash << '\n';
-        //std::cerr << "my hash: " << my_hash << '\n';
         answer = HASH_ERROR_MSSG;
         this->index.putBack(certificate, client_key);
         try {
