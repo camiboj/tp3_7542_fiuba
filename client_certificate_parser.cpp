@@ -29,9 +29,9 @@ CertificateParser::CertificateParser(std::string& filename, Protocol& skt) {
         if (count == 1) {
             len = line.find(' ');
             uint32_t n = (uint32_t) std::stoi(line.substr(0, len));
-            skt.sendNumber(&n);
+            skt.send(n);
         } else if ((count == 2) | (count == 5) | (count == 6)) {
-            skt.sendAll(line);
+            skt.send(line);
         } else if (count == 8) {
             len = line.find(' ');
             module = line.substr(0, len);

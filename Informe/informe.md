@@ -69,21 +69,26 @@ Recibe un número de 4 bytes y lo encripta en un nuevo número de 4 bytes.
 - Recibe el nombre de un archivo de tipo `<exp_publico> <exp_privado> <modulo>` y almacena los valores.
 - Manda y recibe sus datos a través de un protocolo pasado por parámetro.
 
+<div style="page-break-after: always;"></div>
 
 # Esquema del diseño
 
 ## Diagramas de clases
 
 #### Cliente: <br/>
-![Build Status](https://github.com/camiboj/tp3_7542_fiuba/blob/master/Informe/client_class.png) <br/>
+![Build Status](client_class.png) <br/>
+
+<div style="page-break-after: always;"></div>
 
 #### Server:
-Principales clases: <br/> ![Build Status](https://github.com/camiboj/tp3_7542_fiuba/blob/master/Informe/server_class1.png) <br/>
-En función de revoke y new:<br/>![Build Status](https://github.com/camiboj/tp3_7542_fiuba/blob/master/Informe/server_class2.png) <br/>
+Principales clases: <br/> ![Build Status](server_class1.png) <br/>
+En función de revoke y new:<br/>![Build Status](server_class2.png) <br/>
+
+<div style="page-break-after: always;"></div>
 
 ## Diagrama de actividad
 Procesar clientes:
-![Build Status](https://github.com/camiboj/tp3_7542_fiuba/blob/master/Informe/diagrama.png)
+![Build Status](diagrama.png)
 
 
 # Correcciones
